@@ -1,9 +1,9 @@
 # 📡 Local & Global News Radar
 
-An automated news aggregation, NLP analytics, and real-time trend tracking platform built with **.NET 8 Web API** and **React (Vite + TypeScript)**.
+An automated news aggregation, NLP analytics, and real-time trend tracking platform built with **.NET 10 Web API** and **React (Vite + TypeScript)**.
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
-![.NET](https://img.shields.io/badge/.NET-8.0-purple)
+![.NET](https://img.shields.io/badge/.NET-10.0-purple)
 ![React](https://img.shields.io/badge/React-18-blue)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
 ![Docker](https://img.shields.io/badge/Docker-Ready-cyan)
@@ -29,9 +29,9 @@ An automated news aggregation, NLP analytics, and real-time trend tracking platf
 | Domain | Technology / Library |
 | :--- | :--- |
 | **Frontend** | React 18 (Vite), TypeScript, TailwindCSS, TanStack Query, Zustand, Recharts |
-| **Backend** | .NET 8 Web API, Entity Framework Core, SignalR Hubs, `HtmlAgilityPack` |
+| **Backend** | .NET 10 Web API, Entity Framework Core, SignalR Hubs, `HtmlAgilityPack` |
 | **NLP & Analytics** | TF-IDF Keyword Extraction, Time-decay Trend Algorithm, Sentiment Classification |
-| **Database & Cache** | PostgreSQL / SQL Server, Redis Cache (Sorted Sets & SignalR Backplane) |
+| **Database & Cache** | PostgreSQL 16, Redis Cache (Sorted Sets & SignalR Backplane) |
 | **DevOps & Infra** | Docker, Docker Compose, GitHub Actions (CI/CD), Vercel (Client), Railway (Server) |
 
 ---
@@ -40,11 +40,11 @@ An automated news aggregation, NLP analytics, and real-time trend tracking platf
 
 ```text
 [ News Sources (RSS/HTML) ] ──► [ Background Crawler ] ──► [ Deduplication (SHA-256) ]
-                                                                   │
-[ React Client ] ◄── (SignalR) ─── [ .NET 8 API ] ◄─────── [ NLP & Trend Engine ]
-       │                                 │
-       ▼                                 ▼
-[ Vercel CDN ]                    [ PostgreSQL + Redis ]
+                                                                     │
+[ React Client ] ◄── (SignalR) ─── [ .NET 10 API ] ◄────── [ NLP & Trend Engine ]
+       │                                  │
+       ▼                                  ▼
+[ Vercel CDN ]                     [ PostgreSQL + Redis ]
 
 🚀 Features & Modules
 Dashboard & Trend Analytics: Visualizes 24h Hot Tag Clouds, Keyword Frequencies, and Sentiment Ratios.
@@ -59,8 +59,8 @@ Admin Portal: Dynamic XPath Configuration, Real-time Crawler Error Logs, Manual 
 
 💻 Getting Started (Run Locally)
 Prerequisites
-.NET 8 SDK
+.NET 10 SDK
 
-Node.js (v18+)
+Node.js (v22+ LTS)
 
-Docker Desktop (for PostgreSQL & Redis)
+Docker Desktop (for PostgreSQL & Redis containers)
