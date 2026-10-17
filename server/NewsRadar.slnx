@@ -1,3 +1,11 @@
 <Solution>
-  <Project Path="NewsRadar.Api/NewsRadar.Api.csproj" />
+  <Folder Name="/src/">
+    <Project Path="src/NewsRadar.Api/NewsRadar.Api.csproj" />
+    <Project Path="src/NewsRadar.Application/NewsRadar.Application.csproj" />
+    <Project Path="src/NewsRadar.Domain/NewsRadar.Domain.csproj" />
+    <Project Path="src/NewsRadar.Infrastructure/NewsRadar.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/NewsRadar.Api.IntegrationTests/NewsRadar.Api.IntegrationTests.csproj" />
+  </Folder>
 </Solution>

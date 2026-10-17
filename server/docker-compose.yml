@@ -1,0 +1,32 @@
+services:
+  # 1. Container Database PostgreSQL
+  postgres-db:
+    image: postgres:16-alpine
+    container_name: newsradar-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: news_radar_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # 2. Container Backend .NET 10 API
+  newsradar-api:
+    build:
+      context: .
+      dockerfile: src/NewsRadar.Api/Dockerfile
+    container_name: newsradar-api
+    restart: always
+    ports:
+      - "5275:8080"
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=postgres-db;Port=5432;Database=news_radar_db;Username=postgres;Password=123456
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - postgres-db
+
+volumes:
+  postgres_data:

@@ -1,0 +1,58 @@
+@NewsRadar.Api_HostAddress = http://localhost:5275
+@sourceId = tuoitre-thoisu
+
+### 1. GET: Kiểm tra kết nối Database Health Check
+GET {{NewsRadar.Api_HostAddress}}/api/health/db-check
+Accept: application/json
+
+###
+
+### 2. POST: Thêm mới nguồn cào tin (Tuổi Trẻ)
+POST {{NewsRadar.Api_HostAddress}}/api/v1/crawler-sources
+Content-Type: application/json
+
+{
+  "id": "{{sourceId}}",
+  "name": "Tuổi Trẻ - Thời Sự",
+  "rssUrl": "https://tuoitre.vn/rss/thoi-su.rss",
+  "baseUrl": "https://tuoitre.vn",
+  "scanIntervalMinutes": 10,
+  "selectors": "{\"title\":\"h1.article-title\",\"sapo\":\"h2.sapo\",\"body\":\"div.fck_detail\"}"
+}
+
+###
+
+### 3. GET: Lấy danh sách tất cả các nguồn cào tin
+GET {{NewsRadar.Api_HostAddress}}/api/v1/crawler-sources
+Accept: application/json
+
+###
+
+### 4. GET: Lấy chi tiết thông tin 1 nguồn theo ID
+GET {{NewsRadar.Api_HostAddress}}/api/v1/crawler-sources/{{sourceId}}
+Accept: application/json
+
+###
+
+### 5. PUT: Cập nhật thông tin nguồn cào tin
+PUT {{NewsRadar.Api_HostAddress}}/api/v1/crawler-sources/{{sourceId}}
+Content-Type: application/json
+
+{
+  "name": "Tuổi Trẻ Online - Thời Sự High Frequency",
+  "rssUrl": "https://tuoitre.vn/rss/thoi-su.rss",
+  "baseUrl": "https://tuoitre.vn",
+  "scanIntervalMinutes": 5,
+  "selectors": "{\"title\":\"h1.article-title\",\"sapo\":\"h2.sapo\",\"body\":\"div.fck_detail\"}",
+  "isActive": true
+}
+
+###
+
+### 6. PATCH: Tắt/Bật trạng thái cào tin (IsActive)
+PATCH {{NewsRadar.Api_HostAddress}}/api/v1/crawler-sources/{{sourceId}}/status?isActive=false
+
+###
+
+### 7. DELETE: Xóa nguồn cào tin
+DELETE {{NewsRadar.Api_HostAddress}}/api/v1/crawler-sources/{{sourceId}}

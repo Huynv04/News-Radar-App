@@ -1,0 +1,52 @@
+name: NewsRadar CI Pipeline
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    # Khởi tạo PostgreSQL Container tạm thời trên máy chủ GitHub để chạy Integration Test
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: news_radar_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    # 1. Tải code từ GitHub về máy chủ ảo
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    # 2. Cài đặt .NET 10 SDK
+    - name: Setup .NET 10 SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+
+    # 3. Tải các gói Nuget
+    - name: Restore Dependencies
+      run: dotnet restore server/NewsRadar.sln
+
+    # 4. Biên dịch dự án (Build)
+    - name: Build Solution
+      run: dotnet build server/NewsRadar.sln --configuration Release --no-restore
+
+    # 5. Thực thi Integration Tests với Database PostgreSQL ảo
+    - name: Run Integration Tests
+      env:
+        ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=news_radar_db;Username=postgres;Password=postgres"
+      run: dotnet test server/NewsRadar.sln --configuration Release --no-build --verbosity normal
