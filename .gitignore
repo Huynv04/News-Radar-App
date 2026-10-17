@@ -1,0 +1,14 @@
+# Node / React
+client/node_modules/
+client/dist/
+client/.env.local
+
+# .NET / C#
+server/**/bin/
+server/**/obj/
+server/.vs/
+server/**/appsettings.Development.json
+
+# System files
+.DS_Store
+Thumbs.db
