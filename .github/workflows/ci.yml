@@ -39,14 +39,14 @@ jobs:
 
     # 3. Tải các gói Nuget
     - name: Restore Dependencies
-      run: dotnet restore server/NewsRadar.sln
+      run: dotnet restore server/NewsRadar.slnx
 
     # 4. Biên dịch dự án (Build)
     - name: Build Solution
-      run: dotnet build server/NewsRadar.sln --configuration Release --no-restore
+      run: dotnet build server/NewsRadar.slnx --configuration Release --no-restore
 
     # 5. Thực thi Integration Tests với Database PostgreSQL ảo
     - name: Run Integration Tests
       env:
         ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=news_radar_db;Username=postgres;Password=postgres"
-      run: dotnet test server/NewsRadar.sln --configuration Release --no-build --verbosity normal
+      run: dotnet test server/NewsRadar.slnx --configuration Release --no-build --verbosity normal
