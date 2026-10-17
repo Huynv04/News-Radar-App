@@ -1,4 +1,4 @@
-# 📡 Local & Global News Radar
+# Local & Global News Radar
 
 An automated news aggregation, NLP analytics, and real-time trend tracking platform built with **.NET 10 Web API** and **React (Vite + TypeScript)**.
 
@@ -10,7 +10,7 @@ An automated news aggregation, NLP analytics, and real-time trend tracking platf
 
 ---
 
-## 🌟 Overview
+## Overview
 
 **News Radar** solves the information overload problem by automatically scraping, deduplicating, cleaning, and analyzing news from top news providers in Vietnam and worldwide. It processes unstructured news text into actionable metrics like **Sentiment Scores** and **Time-Decay Trend Scores** in real time.
 
@@ -24,7 +24,7 @@ An automated news aggregation, NLP analytics, and real-time trend tracking platf
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 | Domain | Technology / Library |
 | :--- | :--- |
@@ -36,7 +36,7 @@ An automated news aggregation, NLP analytics, and real-time trend tracking platf
 
 ---
 
-## 🏗 System Architecture
+## System Architecture
 
 ```text
 [ News Sources (RSS/HTML) ] ──► [ Background Crawler ] ──► [ Deduplication (SHA-256) ]
@@ -46,7 +46,8 @@ An automated news aggregation, NLP analytics, and real-time trend tracking platf
        ▼                                  ▼
 [ Vercel CDN ]                     [ PostgreSQL + Redis ]
 
-🚀 Features & Modules
+
+## Features & Modules
 Dashboard & Trend Analytics: Visualizes 24h Hot Tag Clouds, Keyword Frequencies, and Sentiment Ratios.
 
 Core Feed & Filtering: Full-text search and multi-criteria filters (Time, Category, Sentiment, Source).
@@ -57,7 +58,7 @@ Personalization: JWT + OAuth2 Google Login, Bookmarks, Reading History, Custom K
 
 Admin Portal: Dynamic XPath Configuration, Real-time Crawler Error Logs, Manual AI Overrides & Pinning.
 
-💻 Getting Started (Run Locally)
+## Getting Started (Run Locally)
 Prerequisites
 .NET 10 SDK
 
