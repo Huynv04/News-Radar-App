@@ -25,22 +25,22 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
             builder.HasKey(s => s.Id);
             builder.Property(s => s.Selectors).HasColumnType("jsonb");
         });
+        // Cấu hình Unique Index cho UrlHash để đảm bảo không bị ghi trùng bài viết ở tầng DB
+        modelBuilder.Entity<Article>(entity =>
+      {
+          entity.ToTable("articles");
+          entity.HasKey(e => e.Id);
+          entity.HasIndex(e => e.UrlHash).IsUnique();
+          entity.Property(e => e.Title).IsRequired().HasMaxLength(500);
+          entity.Property(e => e.Url).IsRequired();
 
-        // Cấu hình bảng Article
-        modelBuilder.Entity<Article>(builder =>
-        {
-            builder.ToTable("articles");
-            builder.HasKey(a => a.Id);
-            builder.HasIndex(a => a.SourceUrl).IsUnique();
-            builder.HasIndex(a => a.HashKey).IsUnique();
+          // Khai báo chính xác khóa ngoại CrawlerSourceId
+          entity.HasOne(e => e.CrawlerSource)
+                .WithMany(s => s.Articles) // <-- Đã bổ sung s.Articles
+                .HasForeignKey(e => e.CrawlerSourceId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
+      });
 
-            // Index tối ưu Cursor-based Pagination
-            builder.HasIndex(a => new { a.PublishedAt, a.Id });
-
-            builder.HasOne(a => a.Source)
-                   .WithMany(s => s.Articles)
-                   .HasForeignKey(a => a.SourceId)
-                   .OnDelete(DeleteBehavior.Cascade);
-        });
     }
 }

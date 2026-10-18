@@ -29,89 +29,53 @@ namespace NewsRadar.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<string>("Author")
+                    b.Property<string>("Content")
                         .HasColumnType("text")
-                        .HasColumnName("author");
+                        .HasColumnName("content");
 
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("category");
-
-                    b.Property<string>("CleanBody")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("clean_body");
-
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime>("CrawledAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnName("crawled_at");
 
-                    b.Property<string>("HashKey")
+                    b.Property<string>("CrawlerSourceId")
                         .IsRequired()
                         .HasColumnType("text")
-                        .HasColumnName("hash_key");
-
-                    b.Property<bool>("IsManuallyOverridden")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_manually_overridden");
-
-                    b.Property<DateTime?>("PinnedUntil")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("pinned_until");
+                        .HasColumnName("crawler_source_id");
 
                     b.Property<DateTime>("PublishedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("published_at");
 
                     b.Property<string>("Sapo")
+                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("sapo");
 
-                    b.Property<string>("SentimentLabel")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("sentiment_label");
-
-                    b.Property<double>("SentimentScore")
-                        .HasColumnType("double precision")
-                        .HasColumnName("sentiment_score");
-
-                    b.Property<string>("SourceId")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("source_id");
-
-                    b.Property<string>("SourceUrl")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("source_url");
-
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
                         .HasColumnName("title");
 
-                    b.Property<double>("TrendScore")
-                        .HasColumnType("double precision")
-                        .HasColumnName("trend_score");
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("url");
+
+                    b.Property<string>("UrlHash")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("url_hash");
 
                     b.HasKey("Id")
                         .HasName("pk_articles");
 
-                    b.HasIndex("HashKey")
+                    b.HasIndex("CrawlerSourceId")
+                        .HasDatabaseName("ix_articles_crawler_source_id");
+
+                    b.HasIndex("UrlHash")
                         .IsUnique()
-                        .HasDatabaseName("ix_articles_hash_key");
-
-                    b.HasIndex("SourceId")
-                        .HasDatabaseName("ix_articles_source_id");
-
-                    b.HasIndex("SourceUrl")
-                        .IsUnique()
-                        .HasDatabaseName("ix_articles_source_url");
-
-                    b.HasIndex("PublishedAt", "Id")
-                        .HasDatabaseName("ix_articles_published_at_id");
+                        .HasDatabaseName("ix_articles_url_hash");
 
                     b.ToTable("articles", (string)null);
                 });
@@ -166,14 +130,14 @@ namespace NewsRadar.Infrastructure.Migrations
 
             modelBuilder.Entity("NewsRadar.Domain.Entities.Article", b =>
                 {
-                    b.HasOne("NewsRadar.Domain.Entities.CrawlerSource", "Source")
+                    b.HasOne("NewsRadar.Domain.Entities.CrawlerSource", "CrawlerSource")
                         .WithMany("Articles")
-                        .HasForeignKey("SourceId")
+                        .HasForeignKey("CrawlerSourceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_articles_crawler_sources_source_id");
+                        .HasConstraintName("fk_articles_crawler_sources_crawler_source_id");
 
-                    b.Navigation("Source");
+                    b.Navigation("CrawlerSource");
                 });
 
             modelBuilder.Entity("NewsRadar.Domain.Entities.CrawlerSource", b =>

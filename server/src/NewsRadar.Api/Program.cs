@@ -1,16 +1,34 @@
 using Microsoft.EntityFrameworkCore;
 using NewsRadar.Infrastructure;
+using NewsRadar.Infrastructure.BackgroundServices;
+using NewsRadar.Infrastructure.Services;
 using NewsRadar.Infrastructure.Persistence;
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// ĐĂNG KÝ TẤT CẢ CÁC DỊCH VỤ (TẤT CẢ PHẢI NẰM TRƯỚC builder.Build())
+// 1. Thêm dịch vụ CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173") // Port mặc định của Vite React
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 
+// Add services to the container.
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
 // Đăng ký Infrastructure Services (bao gồm PostgreSQL DbContext)
 builder.Services.AddInfrastructureServices(builder.Configuration);
+// 1. Đăng ký HttpClient & NewsCrawlerService
+builder.Services.AddHttpClient<NewsCrawlerService>();
+
+// 2. Đăng ký BackgroundService chạy ngầm
+builder.Services.AddHostedService<CrawlerBackgroundService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -20,6 +38,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+// 2. Kích hoạt Middleware CORS (Đặt trước UseAuthorization/MapControllers)
+app.UseCors("AllowReactApp");
 
 app.UseAuthorization();
 
@@ -31,6 +51,7 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     await dbContext.Database.MigrateAsync();
 }
+
 app.Run();
 // Thêm dòng này ở cuối cùng của file Program.cs
 public partial class Program { }

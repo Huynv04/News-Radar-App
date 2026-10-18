@@ -3,22 +3,18 @@ namespace NewsRadar.Domain.Entities;
 public class Article
 {
     public Guid Id { get; set; } = Guid.NewGuid();
-    public string Title { get; set; } = null!;
-    public string? Sapo { get; set; }
-    public string CleanBody { get; set; } = null!;
-    public string SourceUrl { get; set; } = null!;
-    public string SourceId { get; set; } = null!;
-    public string? Author { get; set; }
-    public DateTime PublishedAt { get; set; }
-    public string HashKey { get; set; } = null!; // SHA-256 Deduplication
-    public string Category { get; set; } = null!;
-    public double SentimentScore { get; set; }
-    public string SentimentLabel { get; set; } = null!;
-    public double TrendScore { get; set; } = 0.0;
-    public bool IsManuallyOverridden { get; set; } = false;
-    public DateTime? PinnedUntil { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public string Title { get; set; } = string.Empty;
+    public string Sapo { get; set; } = string.Empty;
+    public string? Content { get; set; }
+    public string Url { get; set; } = string.Empty;
 
-    // Navigation property
-    public CrawlerSource? Source { get; set; }
+    // Chuỗi Hash SHA-256 của URL để đánh Index tìm kiếm & lọc trùng bài viết cực nhanh
+    public string UrlHash { get; set; } = string.Empty;
+
+    public DateTime PublishedAt { get; set; }
+    public DateTime CrawledAt { get; set; } = DateTime.UtcNow;
+
+    // Khoá ngoại liên kết tới CrawlerSource ở Module 1
+    public string CrawlerSourceId { get; set; } = string.Empty;
+    public CrawlerSource? CrawlerSource { get; set; }
 }

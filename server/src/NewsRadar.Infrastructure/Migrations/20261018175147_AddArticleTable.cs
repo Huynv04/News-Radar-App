@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace NewsRadar.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class AddArticleTable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -35,53 +35,35 @@ namespace NewsRadar.Infrastructure.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
-                    title = table.Column<string>(type: "text", nullable: false),
-                    sapo = table.Column<string>(type: "text", nullable: true),
-                    clean_body = table.Column<string>(type: "text", nullable: false),
-                    source_url = table.Column<string>(type: "text", nullable: false),
-                    source_id = table.Column<string>(type: "text", nullable: false),
-                    author = table.Column<string>(type: "text", nullable: true),
+                    title = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    sapo = table.Column<string>(type: "text", nullable: false),
+                    content = table.Column<string>(type: "text", nullable: true),
+                    url = table.Column<string>(type: "text", nullable: false),
+                    url_hash = table.Column<string>(type: "text", nullable: false),
                     published_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    hash_key = table.Column<string>(type: "text", nullable: false),
-                    category = table.Column<string>(type: "text", nullable: false),
-                    sentiment_score = table.Column<double>(type: "double precision", nullable: false),
-                    sentiment_label = table.Column<string>(type: "text", nullable: false),
-                    trend_score = table.Column<double>(type: "double precision", nullable: false),
-                    is_manually_overridden = table.Column<bool>(type: "boolean", nullable: false),
-                    pinned_until = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    crawled_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    crawler_source_id = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("pk_articles", x => x.id);
                     table.ForeignKey(
-                        name: "fk_articles_crawler_sources_source_id",
-                        column: x => x.source_id,
+                        name: "fk_articles_crawler_sources_crawler_source_id",
+                        column: x => x.crawler_source_id,
                         principalTable: "crawler_sources",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "ix_articles_hash_key",
+                name: "ix_articles_crawler_source_id",
                 table: "articles",
-                column: "hash_key",
-                unique: true);
+                column: "crawler_source_id");
 
             migrationBuilder.CreateIndex(
-                name: "ix_articles_published_at_id",
+                name: "ix_articles_url_hash",
                 table: "articles",
-                columns: new[] { "published_at", "id" });
-
-            migrationBuilder.CreateIndex(
-                name: "ix_articles_source_id",
-                table: "articles",
-                column: "source_id");
-
-            migrationBuilder.CreateIndex(
-                name: "ix_articles_source_url",
-                table: "articles",
-                column: "source_url",
+                column: "url_hash",
                 unique: true);
         }
 
