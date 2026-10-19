@@ -1,17 +1,22 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useState } from 'react';
 import { CrawlerSourcesPage } from './pages/CrawlerSourcesPage';
-function App() {
-  const [count, setCount] = useState(0)
+import { NewsFeedPage } from './pages/NewsFeedPage';
+
+export function App() {
+  const [tab, setTab] = useState<'feed' | 'sources'>('feed');
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <CrawlerSourcesPage />
+    <div>
+      {/* Menu chuyển trang */}
+      <nav style={{ padding: '10px', background: '#eee' }}>
+        <button onClick={() => setTab('feed')}> Xem Bảng Tin</button>
+        <button onClick={() => setTab('sources')}> Quản Lý Nguồn Cào</button>
+      </nav>
+
+      {/* Hiển thị trang tương ứng */}
+      {tab === 'feed' ? <NewsFeedPage /> : <CrawlerSourcesPage />}
     </div>
   );
 }
 
-export default App
+export default App;
