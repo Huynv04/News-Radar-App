@@ -2,16 +2,23 @@ using Microsoft.EntityFrameworkCore;
 using NewsRadar.Application.Common.DTOs;
 using NewsRadar.Application.Interfaces;
 using NewsRadar.Infrastructure.Persistence;
+using NewsRadar.Application.Common.Interfaces;
+using MediatR;
+using NewsRadar.Application.Common.Events;
 
 namespace NewsRadar.Infrastructure.Services;
 
 public class ArticleService : IArticleService
 {
     private readonly ApplicationDbContext _context;
+    private readonly IMediator _mediator;
 
-    public ArticleService(ApplicationDbContext context)
+    public ArticleService(
+        ApplicationDbContext context,
+        IMediator mediator)
     {
         _context = context;
+        _mediator = mediator;
     }
 
     public async Task<CursorPagedResult<ArticleDto>> GetArticlesAsync(ArticleFilterParams filter)
@@ -65,6 +72,7 @@ public class ArticleService : IArticleService
         query = query.OrderByDescending(a => a.PublishedAt)
                      .ThenByDescending(a => a.Id);
 
+
         // Lấy PageSize + 1 để kiểm tra còn trang sau không (HasNextPage)
         var pageSize = Math.Min(Math.Max(filter.PageSize, 1), 50);
         var items = await query.Take(pageSize + 1)
@@ -102,4 +110,26 @@ public class ArticleService : IArticleService
             HasNextPage = hasNextPage
         };
     }
+    public async Task ProcessAndBroadcastArticleAsync(Domain.Entities.Article article)
+    {
+        _context.Articles.Add(article);
+        await _context.SaveChangesAsync();
+
+        if (article.TrendScore >= 120)
+        {
+            var source = await _context.CrawlerSources.FindAsync(article.CrawlerSourceId);
+            string sourceName = source != null ? source.Name : "N/A";
+
+            // Bắn Domain Event qua MediatR, tuyệt đối sạch Clean Architecture
+            await _mediator.Publish(new HotArticleDetectedEvent
+            {
+                ArticleId = article.Id,
+                Title = article.Title,
+                TrendScore = article.TrendScore,
+                SourceName = sourceName,
+                PublishedAt = article.PublishedAt
+            });
+        }
+    }
+
 }

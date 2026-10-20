@@ -21,4 +21,5 @@ public class ArticlesController : ControllerBase
         var result = await _articleService.GetArticlesAsync(filter);
         return Ok(result);
     }
+
 }

@@ -13,6 +13,14 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+# 1.1 Bổ sung Container Redis Cache
+  newsradar-redis:
+    image: redis:7-alpine
+    container_name: newsradar-redis
+    restart: always
+    ports:
+      - "6379:6379"
+      
   # 2. Container Backend .NET 10 API
   newsradar-api:
     build:
