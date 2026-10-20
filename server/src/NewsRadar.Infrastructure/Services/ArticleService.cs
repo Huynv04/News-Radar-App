@@ -33,6 +33,11 @@ public class ArticleService : IArticleService
             query = query.Where(a => a.Title.ToLower().Contains(keyword) ||
                                      a.Sapo.ToLower().Contains(keyword));
         }
+        // Thêm đoạn lọc Sentiment này ngay dưới phần lọc SearchKeyword trong GetArticlesAsync:
+        if (!string.IsNullOrWhiteSpace(filter.Sentiment))
+        {
+            query = query.Where(a => a.SentimentLabel == filter.Sentiment);
+        }
 
         // 3. Lọc theo khoảng thời gian
         if (filter.FromDate.HasValue)
@@ -73,7 +78,11 @@ public class ArticleService : IArticleService
                 PublishedAt = a.PublishedAt,
                 CrawledAt = a.CrawledAt,
                 CrawlerSourceId = a.CrawlerSourceId,
-                CrawlerSourceName = a.CrawlerSource != null ? a.CrawlerSource.Name : "N/A"
+                CrawlerSourceName = a.CrawlerSource != null ? a.CrawlerSource.Name : "N/A",
+                ContentHash = a.ContentHash,
+                SentimentLabel = a.SentimentLabel,
+                SentimentScore = a.SentimentScore,
+                TrendScore = a.TrendScore
             })
             .ToListAsync();
 

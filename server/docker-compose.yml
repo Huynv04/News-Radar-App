@@ -1,6 +1,6 @@
 services:
   # 1. Container Database PostgreSQL
-  postgres-db:
+  newsradar-postgres:
     image: postgres:16-alpine
     container_name: newsradar-postgres
     restart: always
@@ -23,10 +23,10 @@ services:
     ports:
       - "5275:8080"
     environment:
-      - ConnectionStrings__DefaultConnection=Host=postgres-db;Port=5432;Database=news_radar_db;Username=postgres;Password=123456
+      - ConnectionStrings__DefaultConnection=Host=newsradar-postgres;Port=5432;Database=news_radar_db;Username=postgres;Password=123456
       - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
-      - postgres-db
+      - newsradar-postgres
 
 volumes:
   postgres_data:

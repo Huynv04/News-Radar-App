@@ -33,6 +33,11 @@ namespace NewsRadar.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("content");
 
+                    b.Property<string>("ContentHash")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("content_hash");
+
                     b.Property<DateTime>("CrawledAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("crawled_at");
@@ -51,11 +56,24 @@ namespace NewsRadar.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("sapo");
 
+                    b.Property<string>("SentimentLabel")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("sentiment_label");
+
+                    b.Property<double>("SentimentScore")
+                        .HasColumnType("double precision")
+                        .HasColumnName("sentiment_score");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)")
                         .HasColumnName("title");
+
+                    b.Property<double>("TrendScore")
+                        .HasColumnType("double precision")
+                        .HasColumnName("trend_score");
 
                     b.Property<string>("Url")
                         .IsRequired()

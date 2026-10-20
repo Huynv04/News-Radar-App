@@ -11,12 +11,19 @@ public class ArticleDto
     public DateTime CrawledAt { get; set; }
     public string CrawlerSourceId { get; set; } = string.Empty;
     public string CrawlerSourceName { get; set; } = string.Empty;
+
+    // Bổ sung Module 4
+    public string ContentHash { get; set; } = string.Empty;
+    public string SentimentLabel { get; set; } = "Neutral";
+    public double SentimentScore { get; set; }
+    public double TrendScore { get; set; }
 }
 
 public class ArticleFilterParams
 {
     public string? SourceId { get; set; }
     public string? SearchKeyword { get; set; }
+    public string? Sentiment { get; set; } // Lọc theo: Positive, Negative, Neutral
     public DateTime? FromDate { get; set; }
     public DateTime? ToDate { get; set; }
 

@@ -4,6 +4,7 @@ using NewsRadar.Infrastructure.BackgroundServices;
 using NewsRadar.Infrastructure.Services;
 using NewsRadar.Infrastructure.Persistence;
 using NewsRadar.Application.Interfaces;
+using NewsRadar.Application.Common.Interfaces;
 var builder = WebApplication.CreateBuilder(args);
 
 // ĐĂNG KÝ TẤT CẢ CÁC DỊCH VỤ (TẤT CẢ PHẢI NẰM TRƯỚC builder.Build())
@@ -31,8 +32,8 @@ builder.Services.AddHttpClient<NewsCrawlerService>();
 builder.Services.AddScoped<IArticleService, ArticleService>();
 // 2. Đăng ký BackgroundService chạy ngầm
 builder.Services.AddHostedService<CrawlerBackgroundService>();
+builder.Services.AddScoped<INlpService, NlpService>();
 var app = builder.Build();
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

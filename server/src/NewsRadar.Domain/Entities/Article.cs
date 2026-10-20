@@ -17,4 +17,10 @@ public class Article
     // Khoá ngoại liên kết tới CrawlerSource ở Module 1
     public string CrawlerSourceId { get; set; } = string.Empty;
     public CrawlerSource? CrawlerSource { get; set; }
+
+    // --- BỔ SUNG CHO MODULE 4 (NLP & DEDUPLICATION) ---
+    public string ContentHash { get; set; } = string.Empty;
+    public string SentimentLabel { get; set; } = "Neutral"; // Positive | Negative | Neutral
+    public double SentimentScore { get; set; } = 0;
+    public double TrendScore { get; set; } = 0;
 }
