@@ -8,11 +8,16 @@ export interface Article {
     crawledAt: string;
     crawlerSourceId: string;
     crawlerSourceName: string;
+    contentHash: string;
+    sentimentLabel: 'Positive' | 'Negative' | 'Neutral';
+    sentimentScore: number;
+    trendScore: number;
 }
 
 export interface ArticleFilterParams {
     sourceId?: string;
     searchKeyword?: string;
+    sentiment?: string;
     fromDate?: string;
     toDate?: string;
     lastPublishedAt?: string;

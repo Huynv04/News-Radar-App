@@ -13,6 +13,7 @@ export function NewsFeedPage() {
     const [keyword, setKeyword] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
     const [errorMsg, setErrorMsg] = useState<string>('');
+    const [selectedSentiment, setSelectedSentiment] = useState<string>('');
 
     // 2. State lưu con trỏ (Cursor) để phân trang
     const [nextLastPublishedAt, setNextLastPublishedAt] = useState<string | undefined>();
@@ -29,13 +30,14 @@ export function NewsFeedPage() {
     }, []);
 
     // Hàm dùng chung để lấy trang đầu tiên
-    const fetchFirstPage = (sourceId: string, searchKeyword: string) => {
+    const fetchFirstPage = (sourceId: string, searchKeyword: string, sentiment?: string) => {
         setLoading(true);
         setErrorMsg('');
 
         articleApi.getArticles({
             sourceId: sourceId || undefined,
             searchKeyword: searchKeyword || undefined,
+            sentiment: selectedSentiment || undefined,
             pageSize: 10,
         })
             .then((res) => {
@@ -50,8 +52,8 @@ export function NewsFeedPage() {
 
     // 4. Tự động tải lại bài viết mỗi khi đổi Nguồn tin trên Dropdown
     useEffect(() => {
-        fetchFirstPage(selectedSource, keyword);
-    }, [selectedSource]);
+        fetchFirstPage(selectedSource, keyword, selectedSentiment);
+    }, [selectedSource, selectedSentiment]);
 
     // 5. Xử lý khi bấm nút Tìm kiếm
     const handleSearch = (e: React.FormEvent) => {
@@ -129,11 +131,18 @@ export function NewsFeedPage() {
                         <li key={item.id} className="article-card">
                             <div className="article-meta">
                                 <span className="source-badge">{item.crawlerSourceName}</span>
+                                <span>
+                                    {item.sentimentLabel === 'Positive' && '🟢 Tích cực'}
+                                    {item.sentimentLabel === 'Negative' && '🔴 Tiêu cực'}
+                                    {item.sentimentLabel === 'Neutral' && '⚪ Trung lập'}
+                                </span>
+                                <span style={{ color: '#ea580c', fontWeight: 600 }}>
+                                    🔥 {item.trendScore}
+                                </span>
                                 <span className="publish-time">
                                     {new Date(item.publishedAt).toLocaleString('vi-VN')}
                                 </span>
                             </div>
-
                             <h3 className="article-title">
                                 <a
                                     href={item.url}

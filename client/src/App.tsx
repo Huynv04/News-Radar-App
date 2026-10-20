@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { CrawlerSourcesPage } from './pages/CrawlerSourcesPage';
 import { NewsFeedPage } from './pages/NewsFeedPage/NewsFeedPage';
+import { AnalyticsDashboardPage } from './pages/AnalyticsDashboardPage/AnalyticsDashboardPage';
 import './App.css';
 
 export function App() {
-  const [tab, setTab] = useState<'feed' | 'sources'>('feed');
+  const [tab, setTab] = useState<'feed' | 'analytics' | 'sources'>('feed');
 
   return (
     <div>
@@ -18,6 +19,12 @@ export function App() {
             Bảng Tin
           </button>
           <button
+            className={tab === 'analytics' ? 'nav-btn active' : 'nav-btn'}
+            onClick={() => setTab('analytics')}
+          >
+            Phân Tích & NLP
+          </button>
+          <button
             className={tab === 'sources' ? 'nav-btn active' : 'nav-btn'}
             onClick={() => setTab('sources')}
           >
@@ -27,7 +34,9 @@ export function App() {
       </header>
 
       <main>
-        {tab === 'feed' ? <NewsFeedPage /> : <CrawlerSourcesPage />}
+        {tab === 'feed' && <NewsFeedPage />}
+        {tab === 'analytics' && <AnalyticsDashboardPage />}
+        {tab === 'sources' && <CrawlerSourcesPage />}
       </main>
     </div>
   );
