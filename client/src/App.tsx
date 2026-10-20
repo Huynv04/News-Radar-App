@@ -1,20 +1,34 @@
 import { useState } from 'react';
 import { CrawlerSourcesPage } from './pages/CrawlerSourcesPage';
-import { NewsFeedPage } from './pages/NewsFeedPage';
+import { NewsFeedPage } from './pages/NewsFeedPage/NewsFeedPage';
+import './App.css';
 
 export function App() {
   const [tab, setTab] = useState<'feed' | 'sources'>('feed');
 
   return (
     <div>
-      {/* Menu chuyển trang */}
-      <nav style={{ padding: '10px', background: '#eee' }}>
-        <button onClick={() => setTab('feed')}> Xem Bảng Tin</button>
-        <button onClick={() => setTab('sources')}> Quản Lý Nguồn Cào</button>
-      </nav>
+      <header className="top-navbar">
+        <h2 className="brand-logo">News Radar</h2>
+        <nav className="nav-buttons">
+          <button
+            className={tab === 'feed' ? 'nav-btn active' : 'nav-btn'}
+            onClick={() => setTab('feed')}
+          >
+            Bảng Tin
+          </button>
+          <button
+            className={tab === 'sources' ? 'nav-btn active' : 'nav-btn'}
+            onClick={() => setTab('sources')}
+          >
+            Quản Lý Nguồn Cào
+          </button>
+        </nav>
+      </header>
 
-      {/* Hiển thị trang tương ứng */}
-      {tab === 'feed' ? <NewsFeedPage /> : <CrawlerSourcesPage />}
+      <main>
+        {tab === 'feed' ? <NewsFeedPage /> : <CrawlerSourcesPage />}
+      </main>
     </div>
   );
 }
