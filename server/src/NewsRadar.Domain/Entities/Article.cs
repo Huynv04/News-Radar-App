@@ -23,4 +23,8 @@ public class Article
     public string SentimentLabel { get; set; } = "Neutral"; // Positive | Negative | Neutral
     public double SentimentScore { get; set; } = 0;
     public double TrendScore { get; set; } = 0;
+    public string Category { get; set; } = "Thời sự";
+    // Ghim bài viết quan trọng lên đầu trang (Editorial Pinning)
+    public bool IsPinned { get; set; } = false;
+
 }

@@ -1,0 +1,1 @@
+export { HotNewsToast } from './HotNewsToast';

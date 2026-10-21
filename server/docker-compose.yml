@@ -32,9 +32,11 @@ services:
       - "5275:8080"
     environment:
       - ConnectionStrings__DefaultConnection=Host=newsradar-postgres;Port=5432;Database=news_radar_db;Username=postgres;Password=123456
+      - ConnectionStrings__Redis=newsradar-redis:6379
       - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
       - newsradar-postgres
+      - newsradar-redis
 
 volumes:
   postgres_data:

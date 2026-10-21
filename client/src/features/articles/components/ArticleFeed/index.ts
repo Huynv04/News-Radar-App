@@ -1,0 +1,1 @@
+export { ArticleFeed } from './ArticleFeed';

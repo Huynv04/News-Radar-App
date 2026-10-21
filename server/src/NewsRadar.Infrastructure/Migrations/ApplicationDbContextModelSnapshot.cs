@@ -22,12 +22,89 @@ namespace NewsRadar.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("NewsRadar.Domain.Entities.AppUser", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("AvatarUrl")
+                        .HasColumnType("text")
+                        .HasColumnName("avatar_url");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("display_name");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("email");
+
+                    b.Property<string>("GoogleId")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("google_id");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("text")
+                        .HasColumnName("password_hash");
+
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("text")
+                        .HasColumnName("refresh_token");
+
+                    b.Property<DateTime?>("RefreshTokenExpiresAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("refresh_token_expires_at");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("User")
+                        .HasColumnName("role");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_app_users");
+
+                    b.HasIndex("Email")
+                        .IsUnique()
+                        .HasDatabaseName("ix_app_users_email");
+
+                    b.HasIndex("GoogleId")
+                        .HasDatabaseName("ix_app_users_google_id");
+
+                    b.ToTable("app_users", (string)null);
+                });
+
             modelBuilder.Entity("NewsRadar.Domain.Entities.Article", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("Thời sự")
+                        .HasColumnName("category");
 
                     b.Property<string>("Content")
                         .HasColumnType("text")
@@ -46,6 +123,12 @@ namespace NewsRadar.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("crawler_source_id");
+
+                    b.Property<bool>("IsPinned")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_pinned");
 
                     b.Property<DateTime>("PublishedAt")
                         .HasColumnType("timestamp with time zone")
@@ -88,14 +171,110 @@ namespace NewsRadar.Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("pk_articles");
 
+                    b.HasIndex("Category")
+                        .HasDatabaseName("ix_articles_category");
+
                     b.HasIndex("CrawlerSourceId")
                         .HasDatabaseName("ix_articles_crawler_source_id");
+
+                    b.HasIndex("IsPinned")
+                        .HasDatabaseName("ix_articles_is_pinned");
+
+                    b.HasIndex("PublishedAt")
+                        .HasDatabaseName("ix_articles_published_at");
+
+                    b.HasIndex("TrendScore")
+                        .HasDatabaseName("ix_articles_trend_score");
 
                     b.HasIndex("UrlHash")
                         .IsUnique()
                         .HasDatabaseName("ix_articles_url_hash");
 
                     b.ToTable("articles", (string)null);
+                });
+
+            modelBuilder.Entity("NewsRadar.Domain.Entities.Bookmark", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("ArticleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("article_id");
+
+                    b.Property<DateTime>("SavedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("saved_at");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_bookmarks");
+
+                    b.HasIndex("ArticleId")
+                        .HasDatabaseName("ix_bookmarks_article_id");
+
+                    b.HasIndex("UserId", "ArticleId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_bookmarks_user_id_article_id");
+
+                    b.ToTable("bookmarks", (string)null);
+                });
+
+            modelBuilder.Entity("NewsRadar.Domain.Entities.CrawlerLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<int>("ArticlesFound")
+                        .HasColumnType("integer")
+                        .HasColumnName("articles_found");
+
+                    b.Property<int>("ArticlesInserted")
+                        .HasColumnType("integer")
+                        .HasColumnName("articles_inserted");
+
+                    b.Property<string>("CrawlerSourceId")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("crawler_source_id");
+
+                    b.Property<long>("DurationMs")
+                        .HasColumnType("bigint")
+                        .HasColumnName("duration_ms");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("text")
+                        .HasColumnName("error_message");
+
+                    b.Property<int?>("HttpStatusCode")
+                        .HasColumnType("integer")
+                        .HasColumnName("http_status_code");
+
+                    b.Property<bool>("IsSuccess")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_success");
+
+                    b.Property<DateTime>("ScannedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("scanned_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_crawler_logs");
+
+                    b.HasIndex("CrawlerSourceId")
+                        .HasDatabaseName("ix_crawler_logs_crawler_source_id");
+
+                    b.HasIndex("ScannedAt")
+                        .HasDatabaseName("ix_crawler_logs_scanned_at");
+
+                    b.ToTable("crawler_logs", (string)null);
                 });
 
             modelBuilder.Entity("NewsRadar.Domain.Entities.CrawlerSource", b =>
@@ -109,6 +288,12 @@ namespace NewsRadar.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("base_url");
 
+                    b.Property<int>("ConsecutiveFailures")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("consecutive_failures");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -116,6 +301,10 @@ namespace NewsRadar.Infrastructure.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean")
                         .HasColumnName("is_active");
+
+                    b.Property<DateTime?>("LastScannedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_scanned_at");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -146,6 +335,89 @@ namespace NewsRadar.Infrastructure.Migrations
                     b.ToTable("crawler_sources", (string)null);
                 });
 
+            modelBuilder.Entity("NewsRadar.Domain.Entities.ReadingHistory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("ArticleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("article_id");
+
+                    b.Property<DateTime>("ReadAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("read_at");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_reading_histories");
+
+                    b.HasIndex("ArticleId")
+                        .HasDatabaseName("ix_reading_histories_article_id");
+
+                    b.HasIndex("ReadAt")
+                        .HasDatabaseName("ix_reading_histories_read_at");
+
+                    b.HasIndex("UserId", "ArticleId")
+                        .HasDatabaseName("ix_reading_histories_user_id_article_id");
+
+                    b.ToTable("reading_histories", (string)null);
+                });
+
+            modelBuilder.Entity("NewsRadar.Domain.Entities.Subscription", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Category")
+                        .HasColumnType("text")
+                        .HasColumnName("category");
+
+                    b.Property<string>("Channel")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("InApp")
+                        .HasColumnName("channel");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<string>("Keyword")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("keyword");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_subscriptions");
+
+                    b.HasIndex("Keyword")
+                        .HasDatabaseName("ix_subscriptions_keyword");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_subscriptions_user_id");
+
+                    b.ToTable("subscriptions", (string)null);
+                });
+
             modelBuilder.Entity("NewsRadar.Domain.Entities.Article", b =>
                 {
                     b.HasOne("NewsRadar.Domain.Entities.CrawlerSource", "CrawlerSource")
@@ -158,9 +430,84 @@ namespace NewsRadar.Infrastructure.Migrations
                     b.Navigation("CrawlerSource");
                 });
 
+            modelBuilder.Entity("NewsRadar.Domain.Entities.Bookmark", b =>
+                {
+                    b.HasOne("NewsRadar.Domain.Entities.Article", "Article")
+                        .WithMany()
+                        .HasForeignKey("ArticleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_bookmarks_articles_article_id");
+
+                    b.HasOne("NewsRadar.Domain.Entities.AppUser", "User")
+                        .WithMany("Bookmarks")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_bookmarks_app_users_user_id");
+
+                    b.Navigation("Article");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("NewsRadar.Domain.Entities.CrawlerLog", b =>
+                {
+                    b.HasOne("NewsRadar.Domain.Entities.CrawlerSource", "CrawlerSource")
+                        .WithMany("Logs")
+                        .HasForeignKey("CrawlerSourceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_crawler_logs_crawler_sources_crawler_source_id");
+
+                    b.Navigation("CrawlerSource");
+                });
+
+            modelBuilder.Entity("NewsRadar.Domain.Entities.ReadingHistory", b =>
+                {
+                    b.HasOne("NewsRadar.Domain.Entities.Article", "Article")
+                        .WithMany()
+                        .HasForeignKey("ArticleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_reading_histories_articles_article_id");
+
+                    b.HasOne("NewsRadar.Domain.Entities.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_reading_histories_app_users_user_id");
+
+                    b.Navigation("Article");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("NewsRadar.Domain.Entities.Subscription", b =>
+                {
+                    b.HasOne("NewsRadar.Domain.Entities.AppUser", "User")
+                        .WithMany("Subscriptions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_subscriptions_app_users_user_id");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("NewsRadar.Domain.Entities.AppUser", b =>
+                {
+                    b.Navigation("Bookmarks");
+
+                    b.Navigation("Subscriptions");
+                });
+
             modelBuilder.Entity("NewsRadar.Domain.Entities.CrawlerSource", b =>
                 {
                     b.Navigation("Articles");
+
+                    b.Navigation("Logs");
                 });
 #pragma warning restore 612, 618
         }

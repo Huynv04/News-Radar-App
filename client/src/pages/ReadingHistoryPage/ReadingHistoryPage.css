@@ -1,0 +1,111 @@
+.history-page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 32px 24px;
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.history-header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.history-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #f8fafc;
+    margin: 0;
+}
+
+.history-subtitle {
+    font-size: 0.875rem;
+    color: #94a3b8;
+    margin: 4px 0 0 0;
+}
+
+.btn-clear-history {
+    background: rgba(220, 38, 38, 0.15);
+    color: #ef4444;
+    border: 1px solid rgba(220, 38, 38, 0.3);
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-clear-history:hover {
+    background: rgba(220, 38, 38, 0.3);
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.history-item {
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 16px;
+    transition: transform 0.15s, border-color 0.15s;
+}
+
+.history-item:hover {
+    border-color: rgba(59, 130, 246, 0.4);
+    transform: translateY(-1px);
+}
+
+.history-item-top {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: #94a3b8;
+    margin-bottom: 8px;
+}
+
+.history-item-source {
+    font-weight: 600;
+    color: #38bdf8;
+}
+
+.history-item-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #e2e8f0;
+    text-decoration: none;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.history-item-title:hover {
+    color: #60a5fa;
+}
+
+.history-item-sapo {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    line-height: 1.4;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.history-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #64748b;
+}

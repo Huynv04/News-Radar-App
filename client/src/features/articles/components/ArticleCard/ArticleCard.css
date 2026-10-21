@@ -1,0 +1,282 @@
+/* Danh sách bài viết - Card */
+.article-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 22px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.article-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.08);
+    border-color: #cbd5e1;
+}
+
+.article-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    font-size: 12.5px;
+}
+
+.source-badge {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+.category-tag {
+    background-color: #f1f5f9;
+    color: #334155;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+.sentiment-tag {
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.sentiment-positive {
+    background-color: #dcfce7;
+    color: #15803d;
+}
+
+.sentiment-negative {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+
+.sentiment-neutral {
+    background-color: #f1f5f9;
+    color: #475569;
+}
+
+.trend-badge {
+    background-color: #ffedd5;
+    color: #c2410c;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+}
+
+.trend-hot {
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(234, 88, 12, 0.35);
+}
+
+.publish-time {
+    color: #64748b;
+    margin-left: auto;
+}
+
+.article-title {
+    margin: 0 0 10px 0;
+    font-size: 19px;
+    line-height: 1.4;
+}
+
+.article-link {
+    color: #0f172a;
+    text-decoration: none;
+    font-weight: 700;
+    transition: color 0.15s;
+}
+
+.article-link:hover {
+    color: #2563eb;
+}
+
+.article-sapo {
+    margin: 0 0 16px 0;
+    color: #475569;
+    font-size: 14.5px;
+    line-height: 1.6;
+}
+
+.article-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.btn-reader-mode {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2563eb;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-reader-mode:hover {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.btn-external-link {
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+    text-decoration: none;
+    transition: color 0.15s;
+}
+
+.btn-external-link:hover {
+    color: #0f172a;
+}
+
+/* --- Editorial Pinning Styles --- */
+.article-card.is-pinned {
+    border: 1px solid rgba(234, 179, 8, 0.45);
+    background: linear-gradient(180deg, rgba(30, 41, 59, 0.85) 0%, rgba(15, 23, 42, 0.9) 100%);
+    box-shadow: 0 4px 20px -2px rgba(234, 179, 8, 0.15);
+}
+
+.pinned-badge {
+    background: rgba(234, 179, 8, 0.18);
+    color: #facc15;
+    border: 1px solid rgba(234, 179, 8, 0.4);
+    font-size: 0.725rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 12px;
+    letter-spacing: 0.04em;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.btn-pin {
+    background: rgba(255, 255, 255, 0.05);
+    color: #cbd5e1;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn-pin:hover {
+    background: rgba(234, 179, 8, 0.15);
+    color: #facc15;
+    border-color: rgba(234, 179, 8, 0.35);
+}
+
+.btn-pin.pinned {
+    background: rgba(234, 179, 8, 0.2);
+    color: #facc15;
+    border-color: #facc15;
+}
+
+/* --- Admin Manual Override Styles --- */
+.btn-admin-edit {
+    background: rgba(255, 255, 255, 0.08);
+    color: #94a3b8;
+    border: 1px dashed rgba(255, 255, 255, 0.25);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-left: auto;
+}
+
+.btn-admin-edit:hover {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+    border-color: #3b82f6;
+}
+
+.admin-override-box {
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(59, 130, 246, 0.35);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin: 10px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    animation: fadeIn 0.15s ease-out;
+}
+
+.override-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.825rem;
+    color: #cbd5e1;
+}
+
+.override-row label {
+    width: 70px;
+    font-weight: 600;
+}
+
+.override-row select {
+    background: #1e293b;
+    color: #f8fafc;
+    border: 1px solid #475569;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 0.825rem;
+    outline: none;
+    flex: 1;
+}
+
+.override-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 4px;
+}
+
+.btn-override-save {
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 0.775rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-override-save:hover {
+    background: #1d4ed8;
+}
+
+.btn-override-cancel {
+    background: transparent;
+    color: #94a3b8;
+    border: 1px solid #475569;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 0.775rem;
+    cursor: pointer;
+}
+
+.btn-override-cancel:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #f1f5f9;
+}

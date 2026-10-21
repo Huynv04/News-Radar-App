@@ -28,7 +28,9 @@ public class CrawlerSourceService : ICrawlerSourceService
                 ScanIntervalMinutes = s.ScanIntervalMinutes,
                 Selectors = s.Selectors,
                 CreatedAt = s.CreatedAt,
-                UpdatedAt = s.UpdatedAt
+                UpdatedAt = s.UpdatedAt,
+                ConsecutiveFailures = s.ConsecutiveFailures,
+                LastScannedAt = s.LastScannedAt
             })
             .ToListAsync(cancellationToken);
     }
@@ -51,7 +53,9 @@ public class CrawlerSourceService : ICrawlerSourceService
             ScanIntervalMinutes = source.ScanIntervalMinutes,
             Selectors = source.Selectors,
             CreatedAt = source.CreatedAt,
-            UpdatedAt = source.UpdatedAt
+            UpdatedAt = source.UpdatedAt,
+            ConsecutiveFailures = source.ConsecutiveFailures,
+            LastScannedAt = source.LastScannedAt
         };
     }
 
@@ -147,4 +151,31 @@ public class CrawlerSourceService : ICrawlerSourceService
         await _context.SaveChangesAsync(cancellationToken);
         return true;
     }
+    public async Task<IEnumerable<CrawlerLogDto>> GetLogsAsync(string? sourceId = null, int limit = 50, CancellationToken cancellationToken = default)
+{
+    var query = _context.CrawlerLogs.AsNoTracking().AsQueryable();
+
+    if (!string.IsNullOrWhiteSpace(sourceId))
+    {
+        query = query.Where(l => l.CrawlerSourceId == sourceId);
+    }
+
+    return await query
+        .OrderByDescending(l => l.ScannedAt)
+        .Take(limit)
+        .Select(l => new CrawlerLogDto
+        {
+            Id = l.Id,
+            CrawlerSourceId = l.CrawlerSourceId,
+            ScannedAt = l.ScannedAt,
+            ArticlesFound = l.ArticlesFound,
+            ArticlesInserted = l.ArticlesInserted,
+            DurationMs = l.DurationMs,
+            IsSuccess = l.IsSuccess,
+            ErrorMessage = l.ErrorMessage,
+            HttpStatusCode = l.HttpStatusCode
+        })
+        .ToListAsync(cancellationToken);
+}
+
 }

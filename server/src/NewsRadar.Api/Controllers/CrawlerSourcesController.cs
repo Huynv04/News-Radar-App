@@ -1,11 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using NewsRadar.Application.Common.DTOs;
 using NewsRadar.Application.Common.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace NewsRadar.Api.Controllers;
-
+[Authorize(Roles = "Admin")]
 [ApiController]
-[Route("api/v1/crawler-sources")]
+[Route("api/crawler-sources")]
 public class CrawlerSourcesController : ControllerBase
 {
     private readonly ICrawlerSourceService _crawlerSourceService;
@@ -85,4 +86,15 @@ public class CrawlerSourcesController : ControllerBase
             return NotFound(new { message = ex.Message });
         }
     }
+    [HttpGet("logs")]
+public async Task<ActionResult<IEnumerable<CrawlerLogDto>>> GetLogs(
+    [FromQuery] string? sourceId,
+    [FromQuery] int limit = 50,
+    CancellationToken cancellationToken = default)
+{
+    var logs = await _crawlerSourceService.GetLogsAsync(sourceId, limit, cancellationToken);
+    return Ok(logs);
+}
+
+    
 }

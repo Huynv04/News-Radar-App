@@ -17,6 +17,8 @@ public class ArticleDto
     public string SentimentLabel { get; set; } = "Neutral";
     public double SentimentScore { get; set; }
     public double TrendScore { get; set; }
+    public string Category { get; set; } = "Thời sự";
+    public bool IsPinned { get; set; }
 }
 
 public class ArticleFilterParams
@@ -24,6 +26,7 @@ public class ArticleFilterParams
     public string? SourceId { get; set; }
     public string? SearchKeyword { get; set; }
     public string? Sentiment { get; set; } // Lọc theo: Positive, Negative, Neutral
+    public string? Category { get; set; } // Lọc theo Danh mục
     public DateTime? FromDate { get; set; }
     public DateTime? ToDate { get; set; }
 

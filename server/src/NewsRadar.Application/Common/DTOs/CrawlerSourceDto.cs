@@ -11,4 +11,7 @@ public class CrawlerSourceDto
     public string Selectors { get; set; } = null!;
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+    public int ConsecutiveFailures { get; set; }
+public DateTime? LastScannedAt { get; set; }
+
 }

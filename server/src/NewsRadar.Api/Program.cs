@@ -1,71 +1,70 @@
 using Microsoft.EntityFrameworkCore;
-using NewsRadar.Infrastructure;
-using NewsRadar.Infrastructure.BackgroundServices;
-using NewsRadar.Infrastructure.Services;
-using NewsRadar.Infrastructure.Persistence;
-using NewsRadar.Application.Interfaces;
-using NewsRadar.Application.Common.Interfaces;
 using NewsRadar.Application.Common.Events;
+using NewsRadar.Infrastructure;
+using NewsRadar.Infrastructure.Persistence;
 using NewsRadar.Api.Hubs;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// ĐĂNG KÝ TẤT CẢ CÁC DỊCH VỤ (TẤT CẢ PHẢI NẰM TRƯỚC builder.Build())
-// 1. Thêm dịch vụ CORS
+// ── CORS (Bắt buộc cấu hình AllowCredentials cho SignalR WebSocket) ────────────
+var allowedOrigins = builder.Configuration["AllowedOrigins"] ?? "http://localhost:5173";
 builder.Services.AddCors(options =>
-{
     options.AddPolicy("AllowReactApp", policy =>
-    {
-        policy.WithOrigins("http://localhost:5173") // Port mặc định của Vite React
+        policy.WithOrigins(allowedOrigins.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
               .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
-});
+              .AllowAnyHeader()
+              .AllowCredentials()));
 
-// Add services to the container.
+// ── Core Services ─────────────────────────────────────────────────────────────
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-// Đăng ký Infrastructure Services (bao gồm PostgreSQL DbContext)
+// ── Infrastructure (DI: Database, Services, BackgroundService, Redis) ─────────
 builder.Services.AddInfrastructureServices(builder.Configuration);
-// 1. Đăng ký HttpClient & NewsCrawlerService
-builder.Services.AddHttpClient<NewsCrawlerService>();
 
-builder.Services.AddScoped<IArticleService, ArticleService>();
-// 2. Đăng ký BackgroundService chạy ngầm
-builder.Services.AddHostedService<CrawlerBackgroundService>();
-builder.Services.AddScoped<INlpService, NlpService>();
-builder.Services.AddSingleton<IRedisCacheService, RedisCacheService>();
+// ── MediatR (Quét cả 2 assembly: Application Events + Api Handlers) ───────────
+builder.Services.AddMediatR(cfg =>
+    cfg.RegisterServicesFromAssemblies(
+        typeof(HotArticleDetectedEvent).Assembly, // NewsRadar.Application
+        typeof(Program).Assembly));               // NewsRadar.Api
+
+// ── SignalR ───────────────────────────────────────────────────────────────────
 builder.Services.AddSignalR();
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(HotArticleDetectedEvent).Assembly));
 
-// Đăng ký Handler từ tầng Api assembly
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+// ── Build ─────────────────────────────────────────────────────────────────────
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// ── Global RFC 7807 Exception Handler ─────────────────────────────────────────
+app.UseMiddleware<NewsRadar.Api.Middleware.GlobalExceptionMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();
-// 2. Kích hoạt Middleware CORS (Đặt trước UseAuthorization/MapControllers)
-app.UseCors("AllowReactApp");
+app.UseCors("AllowReactApp"); // Áp dụng một lần duy nhất trước MapControllers
 
+app.UseAuthentication(); // ← Module 6: JWT Bearer Authentication
 app.UseAuthorization();
-
 app.MapControllers();
+app.MapHub<NewsHub>("/hubs/news");
 
-// Tự động kiểm tra và áp dụng Migration vào Database
-using (var scope = app.Services.CreateScope())
+
+// ── Auto-migrate Database khi khởi động (kèm log cảnh báo nếu DB chưa sẵn sàng) ──
+try
 {
+    using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     await dbContext.Database.MigrateAsync();
 }
-// Bật CORS và Map Hub
-app.UseCors("AllowAll");
-app.MapHub<NewsHub>("/hubs/news");
+catch (Exception ex)
+{
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    logger.LogWarning("Không thể chạy database migration tự động ({Message}). Đảm bảo PostgreSQL đang chạy.", ex.Message);
+}
+
 app.Run();
-// Thêm dòng này ở cuối cùng của file Program.cs
+
+// Hỗ trợ WebApplicationFactory cho Integration Tests
 public partial class Program { }

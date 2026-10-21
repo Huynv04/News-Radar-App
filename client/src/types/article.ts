@@ -4,6 +4,7 @@ export interface Article {
     sapo: string;
     content?: string;
     url: string;
+    category?: string;
     publishedAt: string;
     crawledAt: string;
     crawlerSourceId: string;
@@ -12,12 +13,14 @@ export interface Article {
     sentimentLabel: 'Positive' | 'Negative' | 'Neutral';
     sentimentScore: number;
     trendScore: number;
+    isPinned?: boolean;
 }
 
 export interface ArticleFilterParams {
     sourceId?: string;
     searchKeyword?: string;
     sentiment?: string;
+    category?: string;
     fromDate?: string;
     toDate?: string;
     lastPublishedAt?: string;

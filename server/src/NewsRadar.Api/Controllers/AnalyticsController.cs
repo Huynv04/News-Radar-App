@@ -7,18 +7,18 @@ namespace NewsRadar.Api.Controllers;
 [Route("api/[controller]")]
 public class AnalyticsController : ControllerBase
 {
-    private readonly INlpService _nlpService;
+    private readonly IAnalyticsService _analyticsService;
 
-    public AnalyticsController(INlpService nlpService)
+    public AnalyticsController(IAnalyticsService analyticsService)
     {
-        _nlpService = nlpService;
+        _analyticsService = analyticsService;
     }
 
     // GET: http://localhost:5275/api/analytics/dashboard
     [HttpGet("dashboard")]
     public async Task<IActionResult> GetDashboard()
     {
-        var result = await _nlpService.GetDashboardAnalyticsAsync();
+        var result = await _analyticsService.GetDashboardAnalyticsAsync();
         return Ok(result);
     }
 
@@ -26,7 +26,7 @@ public class AnalyticsController : ControllerBase
     [HttpPost("reprocess")]
     public async Task<IActionResult> ReprocessArticles()
     {
-        var processedCount = await _nlpService.ReprocessAllArticlesAsync();
+        var processedCount = await _analyticsService.ReprocessAllArticlesAsync();
         return Ok(new { message = "Đã chạy NLP & lọc trùng SHA-256 thành công!", totalRemaining = processedCount });
     }
 }
