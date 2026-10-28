@@ -49,6 +49,11 @@ namespace NewsRadar.Infrastructure.Migrations
                         .HasColumnType("character varying(256)")
                         .HasColumnName("email");
 
+                    b.Property<string>("GitHubId")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("git_hub_id");
+
                     b.Property<string>("GoogleId")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)")
@@ -85,6 +90,9 @@ namespace NewsRadar.Infrastructure.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_app_users_email");
 
+                    b.HasIndex("GitHubId")
+                        .HasDatabaseName("ix_app_users_git_hub_id");
+
                     b.HasIndex("GoogleId")
                         .HasDatabaseName("ix_app_users_google_id");
 
@@ -98,6 +106,11 @@ namespace NewsRadar.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<string>("Author")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("author");
+
                     b.Property<string>("Category")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
@@ -105,6 +118,16 @@ namespace NewsRadar.Infrastructure.Migrations
                         .HasColumnType("character varying(100)")
                         .HasDefaultValue("Thời sự")
                         .HasColumnName("category");
+
+                    b.Property<int>("ClusterCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1)
+                        .HasColumnName("cluster_count");
+
+                    b.Property<Guid?>("ClusterId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("cluster_id");
 
                     b.Property<string>("Content")
                         .HasColumnType("text")
@@ -123,6 +146,11 @@ namespace NewsRadar.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("crawler_source_id");
+
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("image_url");
 
                     b.Property<bool>("IsPinned")
                         .ValueGeneratedOnAdd()
@@ -173,6 +201,9 @@ namespace NewsRadar.Infrastructure.Migrations
 
                     b.HasIndex("Category")
                         .HasDatabaseName("ix_articles_category");
+
+                    b.HasIndex("ClusterId")
+                        .HasDatabaseName("ix_articles_cluster_id");
 
                     b.HasIndex("CrawlerSourceId")
                         .HasDatabaseName("ix_articles_crawler_source_id");

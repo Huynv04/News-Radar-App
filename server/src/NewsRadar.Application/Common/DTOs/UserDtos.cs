@@ -17,6 +17,11 @@ public record GoogleLoginRequest(
     string IdToken // Google ID Token nhận từ Google Sign-In trên client
 );
 
+public record GitHubLoginRequest(
+    string Code, // Mã ủy quyền OAuth2 trả về từ GitHub
+    string? RedirectUri
+);
+
 public record RefreshTokenRequest(
     string RefreshToken
 );

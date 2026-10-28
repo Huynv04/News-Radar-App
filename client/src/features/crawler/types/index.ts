@@ -22,20 +22,6 @@ export interface CreateCrawlerSourceDto {
     selectors: string;
 }
 
-export interface CrawlerSource {
-    id: string;
-    name: string;
-    rssUrl: string;
-    baseUrl: string;
-    isActive: boolean;
-    scanIntervalMinutes: number;
-    selectors: string;
-    consecutiveFailures?: number;
-    lastScannedAt?: string;
-    createdAt?: string;
-    updatedAt?: string;
-}
-
 export interface CrawlerLogDto {
     id: string;
     crawlerSourceId: string;
@@ -46,4 +32,11 @@ export interface CrawlerLogDto {
     isSuccess: boolean;
     errorMessage?: string;
     httpStatusCode?: number;
+}
+
+export interface CrawlerHourlyStatDto {
+    hour: string;
+    successCount: number;
+    failureCount: number;
+    totalArticlesInserted: number;
 }

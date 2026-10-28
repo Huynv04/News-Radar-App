@@ -1,7 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+    ResponsiveContainer,
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    Tooltip,
+    Legend,
+    CartesianGrid,
+} from 'recharts';
 import { useCrawlerSources } from '../../hooks/useCrawlerSources';
 import { crawlerSourceApi } from '../../api/crawlerSourceApi';
-import type { CreateCrawlerSourceDto, CrawlerSource, CrawlerLogDto } from '../../types';
+import type { CreateCrawlerSourceDto, CrawlerSource, CrawlerLogDto, CrawlerHourlyStatDto } from '../../types';
 import './CrawlerSourcesManagement.css';
 
 export const CrawlerSourcesManagement: React.FC = () => {
@@ -11,6 +21,27 @@ export const CrawlerSourcesManagement: React.FC = () => {
     const [logsModalSource, setLogsModalSource] = useState<CrawlerSource | null>(null);
     const [logs, setLogs] = useState<CrawlerLogDto[]>([]);
     const [logsLoading, setLogsLoading] = useState<boolean>(false);
+
+    // === STATE CHO BIỂU ĐỒ GIÁM SÁT TIẾN TRÌNH CÀO TIN THEO GIỜ ===
+    const [hourlyStats, setHourlyStats] = useState<CrawlerHourlyStatDto[]>([]);
+    const [statsLoading, setStatsLoading] = useState<boolean>(false);
+
+    const loadHourlyStats = useCallback(async () => {
+        setStatsLoading(true);
+        try {
+            const data = await crawlerSourceApi.getHourlyStats();
+            setHourlyStats(data);
+        } catch (err) {
+            console.error('Lỗi tải thống kê cào tin theo giờ:', err);
+        } finally {
+            setStatsLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        loadHourlyStats();
+    }, [loadHourlyStats]);
+
     // Hàm mở modal và lấy 20 log gần nhất của nguồn
     const handleViewLogs = async (source: CrawlerSource) => {
         setLogsModalSource(source);
@@ -93,6 +124,42 @@ export const CrawlerSourcesManagement: React.FC = () => {
                     ℹ️ {statusMsg}
                 </div>
             )}
+
+            {/* Biểu đồ Giám Sát Tiến Trình Cào Tin Theo Giờ */}
+            <div className="crawler-chart-card" style={{ background: '#ffffff', borderRadius: '12px', padding: '20px', marginBottom: '24px', border: '1px solid #e2e8f0', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                    <div>
+                        <h2 style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', margin: '0 0 4px 0' }}>
+                            📊 Giám Sát Tiến Trình Cào Tin Theo Giờ (24h qua)
+                        </h2>
+                        <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>
+                            Biểu đồ theo dõi số lượng bài cào thành công, thất bại và tổng bài viết nạp mới theo từng giờ
+                        </p>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={loadHourlyStats}
+                        disabled={statsLoading}
+                        style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', color: '#334155' }}
+                    >
+                        {statsLoading ? '⏳ Đang nạp...' : '🔄 Làm mới'}
+                    </button>
+                </div>
+                <div style={{ width: '100%', height: 240 }}>
+                    <ResponsiveContainer>
+                        <BarChart data={hourlyStats} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                            <XAxis dataKey="hour" tick={{ fontSize: 11, fill: '#64748b' }} interval={2} />
+                            <YAxis tick={{ fontSize: 11, fill: '#64748b' }} />
+                            <Tooltip />
+                            <Legend wrapperStyle={{ fontSize: '12px' }} />
+                            <Bar dataKey="successCount" name="Quét thành công" fill="#16a34a" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="failureCount" name="Quét lỗi" fill="#dc2626" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="totalArticlesInserted" name="Bài viết mới" fill="#7c3aed" radius={[4, 4, 0, 0]} />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+            </div>
 
             {loading ? (
                 <div className="crawler-mgmt-loading">

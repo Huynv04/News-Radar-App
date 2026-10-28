@@ -29,6 +29,11 @@ export interface GoogleLoginRequest {
     idToken: string;
 }
 
+export interface GitHubLoginRequest {
+    code: string;
+    redirectUri?: string;
+}
+
 export interface RefreshTokenRequest {
     refreshToken: string;
 }

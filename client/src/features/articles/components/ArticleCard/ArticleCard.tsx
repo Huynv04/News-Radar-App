@@ -91,6 +91,20 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({ article, onOpenReader 
                     {typeof article.trendScore === 'number' ? article.trendScore.toFixed(1) : '0.0'}
                 </span>
 
+                {/* Hiển thị Đa nguồn cùng đưa tin (Cosine Similarity Clustering) */}
+                {(article.clusterCount ?? 1) > 1 && (
+                    <span className="cluster-badge" title="Phát hiện sự kiện đa nguồn qua Cosine Similarity">
+                        👥 {article.clusterCount} báo cùng đưa tin
+                    </span>
+                )}
+
+                {/* Hiển thị Tác giả */}
+                {article.author && (
+                    <span className="author-badge" title={`Tác giả: ${article.author}`}>
+                        ✍️ {article.author}
+                    </span>
+                )}
+
                 <time className="publish-time" dateTime={article.publishedAt}>
                     {formatDate(article.publishedAt)}
                 </time>
@@ -153,18 +167,34 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({ article, onOpenReader 
                 </div>
             )}
 
-            <h2 className="article-title">
-                <a
-                    href={article.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="article-link"
-                >
-                    {article.title}
-                </a>
-            </h2>
-
-            {article.sapo && <p className="article-sapo">{article.sapo}</p>}
+            <div className="article-body-wrapper" style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', margin: '10px 0 16px 0' }}>
+                {article.imageUrl && (
+                    <div className="article-thumbnail-box" style={{ flexShrink: 0, width: '130px', height: '90px', borderRadius: '8px', overflow: 'hidden', border: '1px solid #e2e8f0', background: '#f8fafc' }}>
+                        <img
+                            src={article.imageUrl}
+                            alt={article.title}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            onError={(e) => {
+                                const parent = e.currentTarget.parentElement;
+                                if (parent) parent.style.display = 'none';
+                            }}
+                        />
+                    </div>
+                )}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                    <h2 className="article-title" style={{ marginTop: 0 }}>
+                        <a
+                            href={article.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="article-link"
+                        >
+                            {article.title}
+                        </a>
+                    </h2>
+                    {article.sapo && <p className="article-sapo" style={{ margin: 0 }}>{article.sapo}</p>}
+                </div>
+            </div>
 
             <div className="article-actions">
                 <button

@@ -38,4 +38,11 @@ export const crawlerSourceApi = {
         const response = await apiClient.get<CrawlerLogDto[]>(`/crawler-sources/logs?${params.toString()}`);
         return response.data;
     },
+
+    getHourlyStats: async (sourceId?: string): Promise<import('../types').CrawlerHourlyStatDto[]> => {
+        const params = new URLSearchParams();
+        if (sourceId) params.append('sourceId', sourceId);
+        const response = await apiClient.get<import('../types').CrawlerHourlyStatDto[]>(`/crawler-sources/logs/hourly-stats?${params.toString()}`);
+        return response.data;
+    },
 };

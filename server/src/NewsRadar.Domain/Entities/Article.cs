@@ -27,4 +27,9 @@ public class Article
     // Ghim bài viết quan trọng lên đầu trang (Editorial Pinning)
     public bool IsPinned { get; set; } = false;
 
+    // --- BỔ SUNG: Tác giả, Hình ảnh đại diện & Cụm sự kiện (Clustering Cosine Similarity) ---
+    public string? Author { get; set; }
+    public string? ImageUrl { get; set; }
+    public Guid? ClusterId { get; set; }
+    public int ClusterCount { get; set; } = 1;
 }

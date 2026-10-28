@@ -176,6 +176,42 @@ public class CrawlerSourceService : ICrawlerSourceService
             HttpStatusCode = l.HttpStatusCode
         })
         .ToListAsync(cancellationToken);
-}
+    }
 
+    public async Task<IEnumerable<CrawlerHourlyStatDto>> GetHourlyStatsAsync(string? sourceId = null, CancellationToken cancellationToken = default)
+    {
+        var cutoff = DateTime.UtcNow.AddHours(-24);
+        var query = _context.CrawlerLogs.AsNoTracking().Where(l => l.ScannedAt >= cutoff);
+
+        if (!string.IsNullOrWhiteSpace(sourceId))
+        {
+            query = query.Where(l => l.CrawlerSourceId == sourceId);
+        }
+
+        var logs = await query.ToListAsync(cancellationToken);
+
+        // Chuẩn bị 24 khung giờ gần nhất
+        var result = new List<CrawlerHourlyStatDto>();
+        for (int i = 23; i >= 0; i--)
+        {
+            var targetHour = DateTime.UtcNow.AddHours(-i);
+            var hourLabel = targetHour.ToString("HH:00");
+
+            var matchedLogs = logs.Where(l =>
+                l.ScannedAt.Year == targetHour.Year &&
+                l.ScannedAt.Month == targetHour.Month &&
+                l.ScannedAt.Day == targetHour.Day &&
+                l.ScannedAt.Hour == targetHour.Hour).ToList();
+
+            result.Add(new CrawlerHourlyStatDto
+            {
+                Hour = hourLabel,
+                SuccessCount = matchedLogs.Count(l => l.IsSuccess),
+                FailureCount = matchedLogs.Count(l => !l.IsSuccess),
+                TotalArticlesInserted = matchedLogs.Sum(l => l.ArticlesInserted)
+            });
+        }
+
+        return result;
+    }
 }

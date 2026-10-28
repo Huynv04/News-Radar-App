@@ -7,7 +7,7 @@ public interface IApplicationDbContext
 {
     DbSet<CrawlerSource> CrawlerSources { get; }
     DbSet<Article> Articles { get; }
-DbSet<CrawlerLog> CrawlerLogs { get; }
+    DbSet<CrawlerLog> CrawlerLogs { get; }
 
     // ── Module 6 ──────────────────────────────────────────────────────────────
     DbSet<AppUser> AppUsers { get; }

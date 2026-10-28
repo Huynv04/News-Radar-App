@@ -39,9 +39,19 @@ export const ArticleReaderModal:
         }, [article, isAuthenticated]);
         if (!article) return null;
 
+        const decodeHtmlEntities = (text: string): string => {
+            if (!text) return '';
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(text, 'text/html');
+            return doc.documentElement.textContent || text;
+        };
+
         const contentParagraphs = article.content
-            ? article.content.split('\n\n').filter((p) => p.trim().length > 0)
+            ? decodeHtmlEntities(article.content)
+                .split('\n\n')
+                .filter((p) => p.trim().length > 0)
             : [];
+
         return (
             <div className="reader-modal-overlay" onClick={onClose} role="dialog" aria-modal="true">
                 <div className="reader-modal-content" onClick={(e) => e.stopPropagation()}>
@@ -49,6 +59,16 @@ export const ArticleReaderModal:
                         <div className="article-meta" style={{ margin: 0 }}>
                             <span className="source-badge">{article.crawlerSourceName || 'Radar Source'}</span>
                             {article.category && <span className="category-tag">{article.category}</span>}
+                            {(article.clusterCount ?? 1) > 1 && (
+                                <span className="cluster-badge" style={{ background: '#fef3c7', color: '#b45309', fontWeight: 600, padding: '4px 10px', borderRadius: '6px', fontSize: '12px' }}>
+                                    👥 {article.clusterCount} báo cùng đưa tin
+                                </span>
+                            )}
+                            {article.author && (
+                                <span className="author-badge" style={{ color: '#64748b', fontSize: '12.5px' }}>
+                                    ✍️ {article.author}
+                                </span>
+                            )}
                         </div>
                         <button
                             type="button"
@@ -61,6 +81,17 @@ export const ArticleReaderModal:
                     </div>
 
                     <h1 className="reader-modal-title">{article.title}</h1>
+
+                    {article.imageUrl && (
+                        <div className="reader-modal-image" style={{ margin: '16px 0', borderRadius: '12px', overflow: 'hidden', maxHeight: '380px', background: '#f1f5f9' }}>
+                            <img
+                                src={article.imageUrl}
+                                alt={article.title}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                                onError={(e) => { (e.currentTarget.parentElement as HTMLElement).style.display = 'none'; }}
+                            />
+                        </div>
+                    )}
 
                     {article.sapo && <div className="reader-modal-sapo">{article.sapo}</div>}
 

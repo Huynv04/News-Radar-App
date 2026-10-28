@@ -44,6 +44,15 @@ public class AuthController : ControllerBase
         return Ok(result);
     }
 
+    /// <summary>Đăng nhập bằng GitHub OAuth2 Code</summary>
+    [HttpPost("github")]
+    [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> LoginWithGitHub([FromBody] GitHubLoginRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _authService.LoginWithGitHubAsync(request, cancellationToken);
+        return Ok(result);
+    }
+
     /// <summary>Làm mới Access Token bằng Refresh Token</summary>
     [HttpPost("refresh")]
     [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]

@@ -30,11 +30,15 @@ public class ArticleService : IArticleService
         if (!string.IsNullOrWhiteSpace(filter.SourceId))
             query = query.Where(a => a.CrawlerSourceId == filter.SourceId);
 
-        // Filter: Tu khoa (Title + Sapo)
+        // Filter: Tu khoa (Title + Sapo + Content + Author)
         if (!string.IsNullOrWhiteSpace(filter.SearchKeyword))
         {
-            var kw = filter.SearchKeyword.Trim().ToLower();
-            query = query.Where(a => a.Title.ToLower().Contains(kw) || a.Sapo.ToLower().Contains(kw));
+            var kw = filter.SearchKeyword.Trim();
+            query = query.Where(a =>
+                EF.Functions.ILike(a.Title, $"%{kw}%") ||
+                EF.Functions.ILike(a.Sapo, $"%{kw}%") ||
+                (a.Content != null && EF.Functions.ILike(a.Content, $"%{kw}%")) ||
+                (a.Author != null && EF.Functions.ILike(a.Author, $"%{kw}%")));
         }
 
         // Filter: Sentiment
@@ -86,6 +90,10 @@ public class ArticleService : IArticleService
                 SentimentLabel    = a.SentimentLabel,
                 SentimentScore    = a.SentimentScore,
                 TrendScore        = a.TrendScore,
+                Author            = a.Author,
+                ImageUrl          = a.ImageUrl,
+                ClusterId         = a.ClusterId,
+                ClusterCount      = a.ClusterCount,
             })
             .ToListAsync();
 
@@ -126,6 +134,10 @@ public class ArticleService : IArticleService
                 SentimentLabel    = a.SentimentLabel,
                 SentimentScore    = a.SentimentScore,
                 TrendScore        = a.TrendScore,
+                Author            = a.Author,
+                ImageUrl          = a.ImageUrl,
+                ClusterId         = a.ClusterId,
+                ClusterCount      = a.ClusterCount,
             })
             .FirstOrDefaultAsync(cancellationToken);
     }
@@ -210,7 +222,11 @@ public class ArticleService : IArticleService
         SentimentScore    = article.SentimentScore,
         TrendScore        = article.TrendScore,
         Category          = article.Category,
-        IsPinned          = article.IsPinned
+        IsPinned          = article.IsPinned,
+        Author            = article.Author,
+        ImageUrl          = article.ImageUrl,
+        ClusterId         = article.ClusterId,
+        ClusterCount      = article.ClusterCount
     };
 }
 

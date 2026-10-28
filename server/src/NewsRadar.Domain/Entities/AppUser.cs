@@ -15,7 +15,10 @@ public class AppUser
     // Đối với tài khoản Google OAuth2: lưu Google sub (unique user ID)
     public string? GoogleId { get; set; }
 
-    // Avatar URL (từ Google profile hoặc gravatar)
+    // Đối với tài khoản GitHub OAuth2: lưu GitHub user ID
+    public string? GitHubId { get; set; }
+
+    // Avatar URL (từ Google/GitHub profile hoặc gravatar)
     public string? AvatarUrl { get; set; }
 
     // Role: "User" | "Admin"

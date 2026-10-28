@@ -11,5 +11,5 @@ public interface ICrawlerSourceService
     Task<bool> DeleteSourceAsync(string id, CancellationToken cancellationToken = default);
     Task<bool> ToggleSourceStatusAsync(string id, bool isActive, CancellationToken cancellationToken = default);
     Task<IEnumerable<CrawlerLogDto>> GetLogsAsync(string? sourceId = null, int limit = 50, CancellationToken cancellationToken = default);
-
+    Task<IEnumerable<CrawlerHourlyStatDto>> GetHourlyStatsAsync(string? sourceId = null, CancellationToken cancellationToken = default);
 }

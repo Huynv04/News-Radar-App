@@ -49,6 +49,10 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.HasIndex(e => e.TrendScore);
             entity.Property(e => e.IsPinned).HasDefaultValue(false);
             entity.HasIndex(e => e.IsPinned);
+            entity.HasIndex(e => e.ClusterId);
+            entity.Property(e => e.Author).HasMaxLength(200);
+            entity.Property(e => e.ImageUrl).HasMaxLength(1000);
+            entity.Property(e => e.ClusterCount).HasDefaultValue(1);
 
 
             // Khai báo chính xác khóa ngoại CrawlerSourceId
@@ -68,6 +72,8 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.HasIndex(e => e.Email).IsUnique();
             entity.Property(e => e.GoogleId).HasMaxLength(256);
             entity.HasIndex(e => e.GoogleId);
+            entity.Property(e => e.GitHubId).HasMaxLength(256);
+            entity.HasIndex(e => e.GitHubId);
             entity.Property(e => e.DisplayName).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Role).HasMaxLength(20).HasDefaultValue("User");
         });

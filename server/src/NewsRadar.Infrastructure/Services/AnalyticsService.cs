@@ -79,6 +79,10 @@ public class AnalyticsService : IAnalyticsService
                 SentimentLabel  = a.SentimentLabel,
                 SentimentScore  = a.SentimentScore,
                 TrendScore      = a.TrendScore,
+                Author          = a.Author,
+                ImageUrl        = a.ImageUrl,
+                ClusterId       = a.ClusterId,
+                ClusterCount    = a.ClusterCount,
             })
             .ToList();
 

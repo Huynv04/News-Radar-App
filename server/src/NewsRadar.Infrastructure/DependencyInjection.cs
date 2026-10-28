@@ -51,7 +51,8 @@ public static class DependencyInjection
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IBookmarkService, BookmarkService>();
         services.AddScoped<ISubscriptionService, SubscriptionService>();
-services.AddScoped<IReadingHistoryService, ReadingHistoryService>();
+        services.AddScoped<IReadingHistoryService, ReadingHistoryService>();
+        services.AddScoped<IEmailNotificationService, EmailNotificationService>();
 
         // ── JWT Bearer Authentication ──────────────────────────────────────────
         var jwtSecret = configuration["Jwt:Secret"]

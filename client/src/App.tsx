@@ -12,12 +12,30 @@ import { AuthProvider, useAuth } from './providers/AuthProvider';
 import './App.css';
 import { ReadingHistoryPage } from './pages/ReadingHistoryPage';
 import { AdminRoute } from './components/AdminRoute';
+import { ArticleReaderModal } from './features/articles/components/ArticleReaderModal';
+import { articleApi } from './features/articles/api/articleApi';
+import type { Article } from './types/article';
 
 
 function MainLayout() {
     const { status, latestHotNews, clearHotNews } = useSignalR();
     const { user, isAuthenticated, logout } = useAuth();
     const [showUserMenu, setShowUserMenu] = useState(false);
+
+    // State lưu bài viết đang mở đọc nhanh từ tin nóng
+    const [readingArticle, setReadingArticle] = useState<Article | null>(null);
+    // Hàm xử lý khi click vào Toast Tin Nóng
+    const handleHotNewsClick = async (articleId: string) => {
+        try {
+            clearHotNews(); // Đóng toast
+            const article = await articleApi.getArticleById(articleId);
+            if (article) {
+                setReadingArticle(article); // Mở Modal đọc bài viết
+            }
+        } catch (err) {
+            console.error('Không thể tải bài viết tin nóng:', err);
+        }
+    };
 
     return (
         <div>
@@ -183,8 +201,15 @@ function MainLayout() {
             <HotNewsToast
                 item={latestHotNews}
                 onClose={clearHotNews}
-                onClickItem={() => { clearHotNews(); }}
+                onClickItem={handleHotNewsClick}
             />
+            {/* Modal đọc nhanh toàn cục khi click vào thông báo Tin Nóng */}
+            {readingArticle && (
+                <ArticleReaderModal
+                    article={readingArticle}
+                    onClose={() => setReadingArticle(null)}
+                />
+            )}
         </div>
     );
 }

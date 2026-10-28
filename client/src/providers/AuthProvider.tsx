@@ -42,6 +42,7 @@ interface AuthContextValue extends AuthState {
     login: (data: LoginRequest) => Promise<void>;
     register: (data: RegisterRequest) => Promise<void>;
     loginWithGoogle: (idToken: string) => Promise<void>;
+    loginWithGitHub: (code: string) => Promise<void>;
     logout: () => Promise<void>;
 }
 
@@ -99,6 +100,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         persistAuth(res.accessToken, res.refreshToken, res.user);
     }, []);
 
+    const loginWithGitHub = useCallback(async (code: string) => {
+        const res = await authApi.loginWithGitHub({ code });
+        persistAuth(res.accessToken, res.refreshToken, res.user);
+    }, []);
+
     const logout = useCallback(async () => {
         try {
             await authApi.logout();
@@ -110,7 +116,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, []);
 
     return (
-        <AuthContext.Provider value={{ ...state, login, register, loginWithGoogle, logout }}>
+        <AuthContext.Provider value={{ ...state, login, register, loginWithGoogle, loginWithGitHub, logout }}>
             {children}
         </AuthContext.Provider>
     );

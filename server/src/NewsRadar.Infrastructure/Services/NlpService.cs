@@ -135,12 +135,19 @@ public class NlpService : INlpService
     }
 
     /// <summary>
-    /// Tính toán điểm nóng Trend Score với công thức suy giảm thời gian (Time-decay).
+    /// Tính toán điểm nóng Trend Score với công thức suy giảm thời gian (Time-decay) kết hợp
+    /// tần suất xuất hiện từ khóa nóng và số lượng báo cùng đưa tin về sự kiện.
     /// </summary>
-    public double CalculateTrendScore(string title, string sapo, DateTime publishedAt)
+    public double CalculateTrendScore(string title, string sapo, DateTime publishedAt, int clusterCount = 1)
     {
         var fullText = $"{title} {sapo}".ToLowerInvariant();
         double baseWeight = 100.0;
+
+        // Cộng điểm độ phủ báo chí (số lượng báo cùng đưa tin về 1 sự kiện qua Cosine Similarity)
+        if (clusterCount > 1)
+        {
+            baseWeight += (clusterCount - 1) * 35.0;
+        }
 
         foreach (var boost in HotBoostWords)
         {

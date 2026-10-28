@@ -6,7 +6,7 @@ import './AuthPage.css';
 type AuthMode = 'login' | 'register';
 declare global { interface Window { google: any } }
 export function AuthPage() {
-    const { login, register, loginWithGoogle } = useAuth();
+    const { login, register, loginWithGoogle, loginWithGitHub } = useAuth();
     const navigate = useNavigate();
     const [mode, setMode] = useState<AuthMode>('login');
     const [isLoading, setIsLoading] = useState(false);
@@ -17,6 +17,25 @@ export function AuthPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+
+    // Kiểm tra GitHub OAuth redirect callback có param `code` không
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const githubCode = urlParams.get('code');
+        if (githubCode) {
+            setIsLoading(true);
+            loginWithGitHub(githubCode)
+                .then(() => {
+                    navigate('/feed', { replace: true });
+                })
+                .catch((err) => {
+                    setError(err instanceof Error ? err.message : 'Đăng nhập GitHub thất bại.');
+                })
+                .finally(() => {
+                    setIsLoading(false);
+                });
+        }
+    }, [loginWithGitHub, navigate]);
 
     useEffect(() => {
         const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -54,6 +73,27 @@ export function AuthPage() {
             }
         }
     }, [loginWithGoogle, navigate]);
+
+    const handleGitHubLogin = () => {
+        const githubClientId = import.meta.env.VITE_GITHUB_CLIENT_ID;
+        if (githubClientId) {
+            const redirectUri = encodeURIComponent(window.location.origin + '/auth');
+            window.location.href = `https://github.com/login/oauth/authorize?client_id=${githubClientId}&redirect_uri=${redirectUri}&scope=user:email`;
+        } else {
+            // Demo mode / Fallback khi chưa có Client ID
+            setIsLoading(true);
+            loginWithGitHub(`mock_gh_${Date.now()}`)
+                .then(() => {
+                    navigate('/feed', { replace: true });
+                })
+                .catch((err) => {
+                    setError(err instanceof Error ? err.message : 'Đăng nhập GitHub thất bại.');
+                })
+                .finally(() => {
+                    setIsLoading(false);
+                });
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -201,9 +241,35 @@ export function AuthPage() {
                         <span>hoặc</span>
                     </div>
 
-                    {/* Google OAuth2 */}
-                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '12px' }}>
+                    {/* Google OAuth2 & GitHub OAuth2 */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', marginTop: '12px' }}>
                         <div id="google-signin-container"></div>
+                        <button
+                            type="button"
+                            id="github-signin-btn"
+                            className="btn-github-auth"
+                            onClick={handleGitHubLogin}
+                            disabled={isLoading}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '8px',
+                                width: '320px',
+                                height: '44px',
+                                borderRadius: '9999px',
+                                border: '1px solid #334155',
+                                backgroundColor: '#0f172a',
+                                color: '#f8fafc',
+                                fontWeight: 600,
+                                fontSize: '14px',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s',
+                            }}
+                        >
+                            <span>🐙</span>
+                            <span>Tiếp tục với GitHub</span>
+                        </button>
                     </div>
 
                     <p className="auth-switch-hint">

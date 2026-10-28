@@ -2,16 +2,17 @@ import React from 'react';
 import './ArticleFilterBar.css';
 
 const CATEGORIES = [
-    'Tất cả',
-    'Thời sự',
-    'Kinh tế',
-    'Công nghệ',
-    'Thể thao',
-    'Giải trí',
-    'Thế giới',
-    'Sức khỏe',
-    'Giáo dục',
+    { label: 'Tất cả', value: 'all' },
+    { label: 'Thời sự', value: 'Thời sự' },
+    { label: 'Kinh tế', value: 'Kinh tế' },
+    { label: 'Công nghệ', value: 'Công nghệ' },
+    { label: 'Thể thao', value: 'Thể thao' },
+    { label: 'Giải trí', value: 'Giải trí' },
+    { label: 'Thế giới', value: 'Thế giới' },
+    { label: 'Sức khỏe', value: 'Sức khỏe' },
+    { label: 'Giáo dục', value: 'Giáo dục' },
 ];
+
 
 const SENTIMENTS = [
     { label: 'Tất cả cảm xúc', value: '' },
@@ -72,11 +73,11 @@ export const ArticleFilterBar: React.FC<ArticleFilterBarProps> = ({
             <div className="category-scroll-bar">
                 {CATEGORIES.map((cat) => (
                     <button
-                        key={cat}
-                        className={`category-pill ${selectedCategory === cat ? 'active' : ''}`}
-                        onClick={() => onSelectCategory(cat)}
+                        key={cat.value}
+                        className={`category-pill ${selectedCategory === cat.value ? 'active' : ''}`}
+                        onClick={() => onSelectCategory(cat.value)}
                     >
-                        {cat}
+                        {cat.label}
                     </button>
                 ))}
             </div>

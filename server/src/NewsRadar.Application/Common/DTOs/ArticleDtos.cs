@@ -19,6 +19,12 @@ public class ArticleDto
     public double TrendScore { get; set; }
     public string Category { get; set; } = "Thời sự";
     public bool IsPinned { get; set; }
+
+    // Tác giả, Hình ảnh đại diện & Cụm sự kiện
+    public string? Author { get; set; }
+    public string? ImageUrl { get; set; }
+    public Guid? ClusterId { get; set; }
+    public int ClusterCount { get; set; } = 1;
 }
 
 public class ArticleFilterParams

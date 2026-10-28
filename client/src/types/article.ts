@@ -14,6 +14,10 @@ export interface Article {
     sentimentScore: number;
     trendScore: number;
     isPinned?: boolean;
+    author?: string;
+    imageUrl?: string;
+    clusterId?: string;
+    clusterCount?: number;
 }
 
 export interface ArticleFilterParams {

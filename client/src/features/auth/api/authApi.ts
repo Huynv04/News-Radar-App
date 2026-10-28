@@ -23,6 +23,11 @@ export const authApi = {
         return res.data;
     },
 
+    loginWithGitHub: async (data: { code: string; redirectUri?: string }): Promise<AuthResponse> => {
+        const res = await apiClient.post<AuthResponse>('/auth/github', data);
+        return res.data;
+    },
+
     logout: async (): Promise<void> => {
         await apiClient.post('/auth/logout');
     },

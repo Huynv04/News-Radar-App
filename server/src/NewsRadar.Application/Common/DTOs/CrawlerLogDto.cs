@@ -12,3 +12,11 @@ public class CrawlerLogDto
     public string? ErrorMessage { get; set; }
     public int? HttpStatusCode { get; set; }
 }
+
+public class CrawlerHourlyStatDto
+{
+    public string Hour { get; set; } = string.Empty;
+    public int SuccessCount { get; set; }
+    public int FailureCount { get; set; }
+    public int TotalArticlesInserted { get; set; }
+}

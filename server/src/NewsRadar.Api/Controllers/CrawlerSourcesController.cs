@@ -16,6 +16,7 @@ public class CrawlerSourcesController : ControllerBase
         _crawlerSourceService = crawlerSourceService;
     }
 
+[AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<CrawlerSourceDto>>> GetAll(CancellationToken cancellationToken)
     {
@@ -87,14 +88,21 @@ public class CrawlerSourcesController : ControllerBase
         }
     }
     [HttpGet("logs")]
-public async Task<ActionResult<IEnumerable<CrawlerLogDto>>> GetLogs(
-    [FromQuery] string? sourceId,
-    [FromQuery] int limit = 50,
-    CancellationToken cancellationToken = default)
-{
-    var logs = await _crawlerSourceService.GetLogsAsync(sourceId, limit, cancellationToken);
-    return Ok(logs);
-}
+    public async Task<ActionResult<IEnumerable<CrawlerLogDto>>> GetLogs(
+        [FromQuery] string? sourceId,
+        [FromQuery] int limit = 50,
+        CancellationToken cancellationToken = default)
+    {
+        var logs = await _crawlerSourceService.GetLogsAsync(sourceId, limit, cancellationToken);
+        return Ok(logs);
+    }
 
-    
+    [HttpGet("logs/hourly-stats")]
+    public async Task<ActionResult<IEnumerable<CrawlerHourlyStatDto>>> GetHourlyStats(
+        [FromQuery] string? sourceId,
+        CancellationToken cancellationToken = default)
+    {
+        var stats = await _crawlerSourceService.GetHourlyStatsAsync(sourceId, cancellationToken);
+        return Ok(stats);
+    }
 }
