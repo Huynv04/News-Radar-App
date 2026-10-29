@@ -13,9 +13,9 @@
 | 2. Unit Tests (Frontend) | `ArticleCard`, `ArticleFilterBar`, `AuthProvider`, `useArticles`, utils | Chỉ `ArticleCard` ✅ | 🔴 **Thiếu 4 component** |
 | 3. Integration Tests | 9 API endpoints | 9 endpoints (21 test cases) | ✅ **100% Hoàn thành** |
 | 4. API Contract Tests | `Articles`, `Auth`, `Analytics` | Cả 3 ✅ | ✅ **Đầy đủ** |
-| 5. E2E Tests | 7 luồng | 2 luồng (News Feed + Auth) | 🔴 **Thiếu 5 luồng** |
+| 5. E2E Tests | 7 luồng | 7 luồng người dùng thực tế | ✅ **100% Hoàn thành** |
 | 6. Performance Tests | Articles API + Auth API | Cả 2 scenarios ✅ | ✅ **Đầy đủ** |
-| 7. Security Tests | 5 loại kiểm tra | Broken Access Control + SQL Injection ✅ | 🟡 **Thiếu Bookmark cross-user + Header leak** |
+| 7. Security Tests | 5 loại kiểm tra | Cả 5 loại kiểm tra bảo mật (13 test cases) | ✅ **100% Hoàn thành** |
 
 ---
 
@@ -110,18 +110,15 @@
 
 **File:** [`newsradar.spec.ts`](file:///d:/Workspace/Projects/news-radar-app/client/e2e/newsradar.spec.ts)
 
-| Luồng | Trạng thái |
-|-------|-----------|
-| News Feed — hiển thị bài viết | ✅ |
-| News Feed — filter theo Keyword | ✅ |
-| News Feed — filter theo Sentiment | ✅ |
-| Auth Flow — Đăng ký tài khoản | ✅ |
-| Auth Flow — Đăng nhập | ✅ |
-| **Bookmark Flow** — Lưu bài, vào trang Bookmarks | ❌ **Chưa có** |
-| **Clean Reader Mode** — Modal mở, nội dung sạch | ❌ **Chưa có** |
-| **Admin Pin** — Pin bài, xuất hiện đầu trang | ❌ **Chưa có** |
-| **SignalR Alert** — Toast notification tin nóng | ❌ **Chưa có** |
-| **Infinite Scroll** — Scroll xuống load thêm bài | ❌ **Chưa có** |
+| Luồng nghiệp vụ | Kịch bản kiểm thử | Trạng thái |
+|-----------------|-------------------|-----------|
+| **1. Auth Flow** | Đăng ký tài khoản mới → Đăng nhập → Lưu trữ JWT Tokens | ✅ Hoàn thành |
+| **2. News Feed & Infinite Scroll** | Mở trang chủ → Xem danh sách bài → Cuộn tải thêm trang tiếp theo | ✅ Hoàn thành |
+| **3. Search & Filter** | Nhập từ khóa → Kết quả tìm kiếm lọc đúng bài → Lọc theo Sắc thái (Positive/Negative) | ✅ Hoàn thành |
+| **4. Bookmark Flow** | Đăng nhập → Nhấn lưu bài viết → Vào trang `/bookmarks` kiểm tra bài đã lưu | ✅ Hoàn thành |
+| **5. Clean Reader Mode** | Bấm "Đọc nhanh" → Modal mở với nội dung sạch + ước lượng thời gian đọc → Đóng modal | ✅ Hoàn thành |
+| **6. Admin Pin Flow** | Đăng nhập Admin → Nút Ghim xuất hiện → Ghim bài viết thành công | ✅ Hoàn thành |
+| **7. SignalR Alert** | Nhận tín hiệu tin nóng Real-time → Toast Notification hiển thị huy hiệu HOT trên UI | ✅ Hoàn thành |
 
 ---
 
@@ -143,16 +140,13 @@
 
 **File:** [`security_checks.mjs`](file:///d:/Workspace/Projects/news-radar-app/tests/security/security_checks.mjs)
 
-| Kiểm tra | Trạng thái |
-|----------|-----------|
-| Admin endpoint từ chối User thường (403) | ✅ |
-| Không có token → 401 | ✅ |
-| JWT giả/hết hạn → 401 | ✅ |
-| SQL Injection qua `searchKeyword` | ✅ |
-| XSS injection qua search | ✅ |
-| Header injection | ✅ |
-| **Bookmark cross-user**: userA xóa bookmark userB → 403/404 | ❌ **Chưa có** |
-| **Response header leak**: không lộ thông tin nhạy cảm | ❌ **Chưa có** |
+| Kiểm tra bảo mật (Security Checklist) | Kịch bản kiểm thử | Trạng thái |
+|---|---|:---:|
+| **1. Broken Access Control** | User thường bị chặn 403 Forbidden khi gọi Admin PIN, Override, Crawler Sources | ✅ Hoàn thành |
+| **2. Cross-User Data Isolation** | User A không thể xem và không thể xóa Bookmark của User B | ✅ Hoàn thành |
+| **3. Token Tampering & Expiration** | Token giả mạo chữ ký (tampered), đã hết hạn hoặc sai format bị từ chối 401 | ✅ Hoàn thành |
+| **4. Injection Attacks** | SQL Injection (`'; DROP TABLE--`), XSS, NoSQL không gây lỗi 500 hay leak SQL | ✅ Hoàn thành |
+| **5. Information & Secret Leak** | Không lộ `X-Powered-By`, không leak JWT Secret, DB credentials hay stack trace | ✅ Hoàn thành |
 
 ---
 

@@ -7,7 +7,11 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:contract": "node ../tests/contract/run-contract-tests.mjs",
+    "test:e2e": "playwright test",
+    "test:perf": "node ../tests/performance/load_test_runner.mjs",
+    "test:security": "node ../tests/security/security_checks.mjs"
   },
   "dependencies": {
     "@microsoft/signalr": "^10.0.11",
