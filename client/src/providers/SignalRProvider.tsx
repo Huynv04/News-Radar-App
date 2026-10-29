@@ -30,7 +30,9 @@ export const SignalRProvider: React.FC<{ children: React.ReactNode }> = ({ child
         // Tránh tạo nhiều connection trong React StrictMode
         if (connectionRef.current || isConnectingRef.current) return;
 
-        const hubUrl = import.meta.env.VITE_HUB_URL || 'http://localhost:5275/hubs/news';
+        const rawApi = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5275';
+        const defaultHubUrl = rawApi.replace(/\/api\/?$/, '') + '/hubs/news';
+        const hubUrl = import.meta.env.VITE_HUB_URL || defaultHubUrl;
 
         const connection = new signalR.HubConnectionBuilder()
             .withUrl(hubUrl, {

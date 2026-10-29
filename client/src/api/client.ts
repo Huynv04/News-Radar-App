@@ -1,6 +1,14 @@
 import axios from 'axios';
 
-const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5275/api';
+// Chuẩn hóa baseURL: Đảm bảo luôn có đuôi '/api' dù người dùng có điền hay quên
+let rawBaseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5275/api';
+if (rawBaseURL.endsWith('/')) {
+  rawBaseURL = rawBaseURL.slice(0, -1);
+}
+if (!rawBaseURL.endsWith('/api')) {
+  rawBaseURL = `${rawBaseURL}/api`;
+}
+const baseURL = rawBaseURL;
 
 export const apiClient = axios.create({
   baseURL,
@@ -37,7 +45,6 @@ apiClient.interceptors.response.use(
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {
-      // Nếu đang refresh thì xếp vào queue chờ
       if (isRefreshing) {
         return new Promise<string>((resolve, reject) => {
           failedQueue.push({ resolve, reject });
@@ -92,4 +99,3 @@ apiClient.interceptors.response.use(
 );
 
 export default apiClient;
-
