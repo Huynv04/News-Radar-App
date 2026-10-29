@@ -9,6 +9,7 @@ namespace NewsRadar.Infrastructure.Services;
 /// <summary>
 /// Dịch vụ Redis Cache quản lý bộ nhớ đệm phân tán.
 /// Tích hợp cơ chế tự phục hồi (Lazy Connect & AbortOnConnectFail = false) chuẩn Enterprise.
+/// Hỗ trợ cả URI chuẩn (redis://, rediss://) và định dạng chuỗi kết nối chuẩn StackExchange.Redis.
 /// </summary>
 public class RedisCacheService : IRedisCacheService
 {
@@ -23,9 +24,31 @@ public class RedisCacheService : IRedisCacheService
             var connectionString = configuration.GetConnectionString("Redis") ?? "localhost:6379";
             try
             {
-                var options = ConfigurationOptions.Parse(connectionString);
-                options.AbortOnConnectFail = false; // Không crash app nếu Redis chưa sẵn sàng
-                options.ConnectTimeout = 3000;
+                ConfigurationOptions options;
+                if (connectionString.StartsWith("redis://", StringComparison.OrdinalIgnoreCase) ||
+                    connectionString.StartsWith("rediss://", StringComparison.OrdinalIgnoreCase))
+                {
+                    var uri = new Uri(connectionString);
+                    var userInfo = uri.UserInfo;
+                    var password = userInfo.Contains(':') ? userInfo.Split(':', 2)[1] : userInfo;
+                    options = new ConfigurationOptions
+                    {
+                        EndPoints = { $"{uri.Host}:{(uri.Port > 0 ? uri.Port : 6379)}" },
+                        Password = string.IsNullOrEmpty(password) ? null : password,
+                        Ssl = connectionString.StartsWith("rediss://", StringComparison.OrdinalIgnoreCase),
+                        AbortOnConnectFail = false,
+                        ConnectTimeout = 10000,
+                        SyncTimeout = 10000
+                    };
+                }
+                else
+                {
+                    options = ConfigurationOptions.Parse(connectionString);
+                    options.AbortOnConnectFail = false; // Không crash app nếu Redis chưa sẵn sàng
+                    options.ConnectTimeout = 10000;
+                    options.SyncTimeout = 10000;
+                }
+
                 return ConnectionMultiplexer.Connect(options);
             }
             catch (Exception ex)
@@ -36,7 +59,21 @@ public class RedisCacheService : IRedisCacheService
         });
     }
 
-    private IDatabase? Database => _redis.Value?.IsConnected == true ? _redis.Value.GetDatabase() : null;
+    private IDatabase? Database
+    {
+        get
+        {
+            try
+            {
+                return _redis.Value?.GetDatabase();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("Không thể lấy Redis Database: {Message}", ex.Message);
+                return null;
+            }
+        }
+    }
 
     public async Task<T?> GetCachedDataAsync<T>(string key)
     {
