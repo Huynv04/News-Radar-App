@@ -21,7 +21,7 @@ export const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
     }
 
     // 3. Nếu đã đăng nhập nhưng KHÔNG PHẢI Admin -> Hiển thị trang 403 Forbidden
-    if (user?.role !== 'Admin') {
+    if (user?.role?.toLowerCase() !== 'admin') {
         return <AccessDeniedPage />;
     }
 

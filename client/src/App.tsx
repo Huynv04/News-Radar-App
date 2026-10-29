@@ -16,7 +16,6 @@ import { ArticleReaderModal } from './features/articles/components/ArticleReader
 import { articleApi } from './features/articles/api/articleApi';
 import type { Article } from './types/article';
 
-
 function MainLayout() {
     const { status, latestHotNews, clearHotNews } = useSignalR();
     const { user, isAuthenticated, logout } = useAuth();
@@ -36,6 +35,8 @@ function MainLayout() {
             console.error('Không thể tải bài viết tin nóng:', err);
         }
     };
+
+    const isAdmin = Boolean(isAuthenticated && user?.role?.toLowerCase() === 'admin');
 
     return (
         <div>
@@ -63,7 +64,7 @@ function MainLayout() {
                             📊 Phân Tích &amp; NLP
                         </NavLink>
                         {/* Quản lý nguồn cào - Chỉ hiển thị cho Admin */}
-                        {isAuthenticated && user?.role === 'Admin' && (
+                        {isAdmin && (
                             <NavLink
                                 to="/sources"
                                 className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
@@ -116,6 +117,11 @@ function MainLayout() {
                                     </span>
                                 }
                                 <span className="user-display-name">{user.displayName}</span>
+                                {isAdmin && (
+                                    <span style={{ fontSize: '10px', background: '#e11d48', color: '#fff', padding: '1px 5px', borderRadius: '4px', fontWeight: 700 }}>
+                                        ADMIN
+                                    </span>
+                                )}
                                 <span className="user-chevron">▾</span>
                             </button>
 
@@ -124,6 +130,18 @@ function MainLayout() {
                                     <div className="user-dropdown-header">
                                         <span className="user-email">{user.email}</span>
                                     </div>
+
+                                    {isAdmin && (
+                                        <NavLink
+                                            to="/sources"
+                                            className="user-dropdown-item"
+                                            onClick={() => setShowUserMenu(false)}
+                                            style={{ color: '#0284c7', fontWeight: 600 }}
+                                        >
+                                            ⚙️ Quản Lý Nguồn Cào
+                                        </NavLink>
+                                    )}
+
                                     <NavLink
                                         to="/bookmarks"
                                         className="user-dropdown-item"
@@ -140,9 +158,10 @@ function MainLayout() {
                                     </NavLink>
                                     <NavLink
                                         to="/history"
-                                        className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+                                        className="user-dropdown-item"
+                                        onClick={() => setShowUserMenu(false)}
                                     >
-                                        🕒 Lịch Sử
+                                        🕒 Lịch Sử Đọc
                                     </NavLink>
 
                                     <div className="user-dropdown-divider" />
