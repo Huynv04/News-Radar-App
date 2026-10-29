@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { historyApi } from '../../features/readinghistory/api/historyApi';
 import type { ReadingHistoryItem } from '../../features/readinghistory/types/ReadingHistoryItem';
+import { formatRelativeTime, decodeHtmlEntities } from '../../utils';
 import './ReadingHistoryPage.css';
 
 export function ReadingHistoryPage() {
@@ -33,16 +34,6 @@ export function ReadingHistoryPage() {
         } catch (err) {
             console.error('Lỗi xóa lịch sử:', err);
         }
-    };
-
-    const formatTimeAgo = (dateStr: string) => {
-        const diffMs = Date.now() - new Date(dateStr).getTime();
-        const mins = Math.floor(diffMs / 60000);
-        if (mins < 1) return 'Vừa xong';
-        if (mins < 60) return `${mins} phút trước`;
-        const hours = Math.floor(mins / 60);
-        if (hours < 24) return `${hours} giờ trước`;
-        return new Date(dateStr).toLocaleDateString('vi-VN');
     };
 
     return (
@@ -78,7 +69,7 @@ export function ReadingHistoryPage() {
                     <div key={item.id} className="history-item">
                         <div className="history-item-top">
                             <span className="history-item-source">{item.crawlerSourceName}</span>
-                            <span>Đã đọc: {formatTimeAgo(item.readAt)}</span>
+                            <span>Đã đọc: {formatRelativeTime(item.readAt)}</span>
                         </div>
                         <a
                             href={item.articleUrl}
@@ -86,9 +77,9 @@ export function ReadingHistoryPage() {
                             rel="noopener noreferrer"
                             className="history-item-title"
                         >
-                            {item.articleTitle}
+                            {decodeHtmlEntities(item.articleTitle)}
                         </a>
-                        {item.articleSapo && <p className="history-item-sapo">{item.articleSapo}</p>}
+                        {item.articleSapo && <p className="history-item-sapo">{decodeHtmlEntities(item.articleSapo)}</p>}
                     </div>
                 ))}
             </div>

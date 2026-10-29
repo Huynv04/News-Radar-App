@@ -22,9 +22,18 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         // ── Database ───────────────────────────────────────────────────────────
-        services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
-                   .UseSnakeCaseNamingConvention());
+        if (configuration.GetValue<bool>("UseInMemoryDatabase"))
+        {
+            var dbName = configuration["InMemoryDbName"] ?? "NewsRadarInMemoryDb";
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseInMemoryDatabase(dbName));
+        }
+        else
+        {
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
+                       .UseSnakeCaseNamingConvention());
+        }
 
         services.AddScoped<IApplicationDbContext>(p =>
             p.GetRequiredService<ApplicationDbContext>());

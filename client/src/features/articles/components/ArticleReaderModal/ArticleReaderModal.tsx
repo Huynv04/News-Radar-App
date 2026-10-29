@@ -3,6 +3,7 @@ import type { Article } from '../../types';
 import './ArticleReaderModal.css';
 import { historyApi } from '../../../readinghistory/api/historyApi';
 import { useAuth } from '../../../../providers/AuthProvider';
+import { decodeHtmlEntities, estimateReadingTime } from '../../../../utils';
 
 
 interface ArticleReaderModalProps {
@@ -13,7 +14,7 @@ interface ArticleReaderModalProps {
 export const ArticleReaderModal:
     React.FC<ArticleReaderModalProps> = ({ article, onClose }) => {
         const { isAuthenticated } = useAuth();
-        // 1. Hook xử lý phím ESC và cuộn trang
+        // 1. Hook xá»­ lÃ½ phÃ­m ESC vÃ  cuá»™n trang
         useEffect(() => {
             const handleKeyDown = (e: KeyboardEvent) => {
                 if (e.key === 'Escape') onClose();
@@ -33,18 +34,13 @@ export const ArticleReaderModal:
         useEffect(() => {
             if (article && isAuthenticated) {
                 historyApi.record(article.id).catch((err) => {
-                    console.error('Lỗi lưu lịch sử đọc:', err);
+                    console.error('Lá»—i lÆ°u lá»‹ch sá»­ Ä‘á»c:', err);
                 });
             }
         }, [article, isAuthenticated]);
         if (!article) return null;
 
-        const decodeHtmlEntities = (text: string): string => {
-            if (!text) return '';
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(text, 'text/html');
-            return doc.documentElement.textContent || text;
-        };
+        const readingTime = estimateReadingTime(article.content);
 
         const contentParagraphs = article.content
             ? decodeHtmlEntities(article.content)
@@ -61,12 +57,17 @@ export const ArticleReaderModal:
                             {article.category && <span className="category-tag">{article.category}</span>}
                             {(article.clusterCount ?? 1) > 1 && (
                                 <span className="cluster-badge" style={{ background: '#fef3c7', color: '#b45309', fontWeight: 600, padding: '4px 10px', borderRadius: '6px', fontSize: '12px' }}>
-                                    👥 {article.clusterCount} báo cùng đưa tin
+                                    ðŸ‘¥ {article.clusterCount} bÃ¡o cÃ¹ng Ä‘Æ°a tin
                                 </span>
                             )}
                             {article.author && (
                                 <span className="author-badge" style={{ color: '#64748b', fontSize: '12.5px' }}>
-                                    ✍️ {article.author}
+                                    âœï¸ {article.author}
+                                </span>
+                            )}
+                            {readingTime > 0 && (
+                                <span className="reading-time-badge" style={{ color: '#64748b', fontSize: '12.5px' }}>
+                                    ⏱️ {readingTime} phút đọc
                                 </span>
                             )}
                         </div>
@@ -74,13 +75,13 @@ export const ArticleReaderModal:
                             type="button"
                             className="reader-close-btn"
                             onClick={onClose}
-                            aria-label="Đóng đọc nhanh"
+                            aria-label="ÄÃ³ng Ä‘á»c nhanh"
                         >
-                            ✕
+                            âœ•
                         </button>
                     </div>
 
-                    <h1 className="reader-modal-title">{article.title}</h1>
+                    <h1 className="reader-modal-title">{decodeHtmlEntities(article.title)}</h1>
 
                     {article.imageUrl && (
                         <div className="reader-modal-image" style={{ margin: '16px 0', borderRadius: '12px', overflow: 'hidden', maxHeight: '380px', background: '#f1f5f9' }}>
@@ -93,21 +94,21 @@ export const ArticleReaderModal:
                         </div>
                     )}
 
-                    {article.sapo && <div className="reader-modal-sapo">{article.sapo}</div>}
+                    {article.sapo && <div className="reader-modal-sapo">{decodeHtmlEntities(article.sapo)}</div>}
 
                     <div className="reader-modal-body">
                         {contentParagraphs.length > 0 ? (
                             contentParagraphs.map((para, idx) => <p key={idx}>{para}</p>)
                         ) : (
                             <p style={{ fontStyle: 'italic', color: '#64748b' }}>
-                                Nội dung chi tiết chưa được cào toàn bộ hoặc là bản tin tóm tắt. Bạn có thể mở bài viết gốc để xem chi tiết.
+                                Ná»™i dung chi tiáº¿t chÆ°a Ä‘Æ°á»£c cÃ o toÃ n bá»™ hoáº·c lÃ  báº£n tin tÃ³m táº¯t. Báº¡n cÃ³ thá»ƒ má»Ÿ bÃ i viáº¿t gá»‘c Ä‘á»ƒ xem chi tiáº¿t.
                             </p>
                         )}
                     </div>
 
                     <div className="reader-modal-footer">
                         <button type="button" className="btn-outline" onClick={onClose}>
-                            Đóng
+                            ÄÃ³ng
                         </button>
                         <a
                             href={article.url}
@@ -116,7 +117,7 @@ export const ArticleReaderModal:
                             className="btn-primary"
                             style={{ textDecoration: 'none', display: 'inline-block' }}
                         >
-                            Đến trang gốc ↗
+                            Äáº¿n trang gá»‘c â†—
                         </a>
                     </div>
                 </div>

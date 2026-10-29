@@ -20,10 +20,18 @@ public class AuthController : ControllerBase
     /// <summary>Đăng ký tài khoản mới bằng Email/Password</summary>
     [HttpPost("register")]
     [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken)
     {
-        var result = await _authService.RegisterAsync(request, cancellationToken);
-        return CreatedAtAction(nameof(GetProfile), null, result);
+        try
+        {
+            var result = await _authService.RegisterAsync(request, cancellationToken);
+            return CreatedAtAction(nameof(GetProfile), null, result);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
     }
 
     /// <summary>Đăng nhập bằng Email/Password → trả về JWT + Refresh Token</summary>

@@ -4,6 +4,7 @@ import { BookmarkButton } from '../BookmarkButton';
 import './ArticleCard.css';
 import { useAuth } from '../../../../providers/AuthProvider';
 import { articleApi } from '../../api/articleApi';
+import { formatDate, isHotArticle, getSentimentMeta, decodeHtmlEntities } from '../../../../utils';
 
 interface ArticleCardProps {
     article: Article;
@@ -53,22 +54,8 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({ article, onOpenReader 
         }
     };
 
-    const isHot = (article.trendScore ?? 0) >= 45 ||
-        article.title.toLowerCase().includes('khẩn') ||
-        article.title.toLowerCase().includes('nóng');
-
-    const formatDate = (dateString?: string) => {
-        if (!dateString) return '';
-        try {
-            const date = new Date(dateString);
-            return new Intl.DateTimeFormat('vi-VN', {
-                dateStyle: 'medium',
-                timeStyle: 'short',
-            }).format(date);
-        } catch {
-            return dateString;
-        }
-    };
+    const isHot = isHotArticle(article.trendScore, article.title);
+    const sentimentMeta = getSentimentMeta(sentiment);
 
     return (
         <article className="article-card">
@@ -80,10 +67,8 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({ article, onOpenReader 
                 <span className="category-tag">{category}</span>
 
                 {/* Hiển thị Sentiment */}
-                <span className={`sentiment-tag sentiment-${sentiment.toLowerCase()}`}>
-                    {sentiment === 'Positive' && '😊 Tích cực'}
-                    {sentiment === 'Negative' && '⚠️ Tiêu cực'}
-                    {sentiment === 'Neutral' && '⚖️ Trung lập'}
+                <span className={`sentiment-tag ${sentimentMeta.className}`}>
+                    {sentimentMeta.icon} {sentimentMeta.label}
                 </span>
 
                 <span className={`trend-badge ${isHot ? 'trend-hot' : ''}`}>
@@ -117,34 +102,41 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({ article, onOpenReader 
                         onClick={() => setIsEditing(!isEditing)}
                         title="Admin can thiệp sửa Category / Sentiment"
                     >
-                        ✏️ Sửa nhãn
+                        ✏️ Sửa NLP
                     </button>
                 )}
             </div>
 
-            {/* Popup chỉnh sửa nhanh khi Admin bấm "Sửa nhãn" */}
+            {/* Popup Can thiệp thủ công (Admin Overrides) */}
             {isAdmin && isEditing && (
-                <div className="admin-override-box">
-                    <div className="override-row">
-                        <label>Danh mục:</label>
-                        <select value={category} onChange={(e) => setCategory(e.target.value)}>
+                <div className="override-form-box">
+                    <h4 className="override-title">🛡️ Can thiệp thủ công (Admin Override)</h4>
+                    <div className="override-fields">
+                        <label className="override-label">Danh mục (Category):</label>
+                        <select
+                            value={category}
+                            onChange={(e) => setCategory(e.target.value)}
+                            className="override-select"
+                        >
                             <option value="Thời sự">Thời sự</option>
-                            <option value="Kinh doanh">Kinh doanh</option>
+                            <option value="Kinh tế">Kinh tế</option>
                             <option value="Công nghệ">Công nghệ</option>
-                            <option value="Thế giới">Thế giới</option>
-                            <option value="Giải trí">Giải trí</option>
                             <option value="Thể thao">Thể thao</option>
+                            <option value="Giải trí">Giải trí</option>
+                            <option value="Thế giới">Thế giới</option>
                             <option value="Sức khỏe">Sức khỏe</option>
                             <option value="Giáo dục">Giáo dục</option>
-                            <option value="Pháp luật">Pháp luật</option>
                         </select>
-                    </div>
-                    <div className="override-row">
-                        <label>Sắc thái:</label>
-                        <select value={sentiment} onChange={(e) => setSentiment(e.target.value)}>
-                            <option value="Positive">😊 Tích cực (Positive)</option>
-                            <option value="Neutral">⚖️ Trung lập (Neutral)</option>
-                            <option value="Negative">⚠️ Tiêu cực (Negative)</option>
+
+                        <label className="override-label">Sắc thái (Sentiment):</label>
+                        <select
+                            value={sentiment}
+                            onChange={(e) => setSentiment(e.target.value)}
+                            className="override-select"
+                        >
+                            <option value="Positive">🟢 Tích cực (Positive)</option>
+                            <option value="Neutral">⚪ Trung lập (Neutral)</option>
+                            <option value="Negative">🔴 Tiêu cực (Negative)</option>
                         </select>
                     </div>
                     <div className="override-buttons">
@@ -189,10 +181,10 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({ article, onOpenReader 
                             rel="noopener noreferrer"
                             className="article-link"
                         >
-                            {article.title}
+                            {decodeHtmlEntities(article.title)}
                         </a>
                     </h2>
-                    {article.sapo && <p className="article-sapo" style={{ margin: 0 }}>{article.sapo}</p>}
+                    {article.sapo && <p className="article-sapo" style={{ margin: 0 }}>{decodeHtmlEntities(article.sapo)}</p>}
                 </div>
             </div>
 
@@ -222,7 +214,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({ article, onOpenReader 
                             disabled={isPinning}
                             title={isPinned ? 'Bỏ ghim bài viết' : 'Ghim bài viết lên đầu trang'}
                         >
-                            {isPinned ? '📍 Đã ghim' : '📌 Ghim'}
+                            {isPinned ? '📌 Đã ghim' : '📌 Ghim'}
                         </button>
                     )}
                     <BookmarkButton articleId={article.id} />

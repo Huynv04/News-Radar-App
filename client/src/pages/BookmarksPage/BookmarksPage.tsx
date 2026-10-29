@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { bookmarkApi } from '../../features/bookmarks';
 import type { BookmarkDto } from '../../types/auth';
+import { formatDate, decodeHtmlEntities } from '../../utils';
 import './BookmarksPage.css';
 
 export function BookmarksPage() {
@@ -36,12 +37,6 @@ export function BookmarksPage() {
         } finally {
             setRemovingId(null);
         }
-    };
-
-    const formatDate = (dateStr: string) => {
-        return new Date(dateStr).toLocaleDateString('vi-VN', {
-            day: '2-digit', month: '2-digit', year: 'numeric',
-        });
     };
 
     return (
@@ -90,10 +85,10 @@ export function BookmarksPage() {
                             rel="noopener noreferrer"
                             className="bookmark-card-title"
                         >
-                            {bookmark.articleTitle}
+                            {decodeHtmlEntities(bookmark.articleTitle)}
                         </a>
 
-                        <p className="bookmark-card-sapo">{bookmark.articleSapo}</p>
+                        <p className="bookmark-card-sapo">{decodeHtmlEntities(bookmark.articleSapo)}</p>
 
                         <div className="bookmark-card-footer">
                             <span className="bookmark-saved-at">

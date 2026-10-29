@@ -7,5 +7,6 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/NewsRadar.Api.IntegrationTests/NewsRadar.Api.IntegrationTests.csproj" />
+    <Project Path="tests/NewsRadar.UnitTests/NewsRadar.UnitTests.csproj" />
   </Folder>
 </Solution>

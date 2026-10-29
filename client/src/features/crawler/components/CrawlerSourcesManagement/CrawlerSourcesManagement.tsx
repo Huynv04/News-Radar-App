@@ -12,6 +12,7 @@ import {
 import { useCrawlerSources } from '../../hooks/useCrawlerSources';
 import { crawlerSourceApi } from '../../api/crawlerSourceApi';
 import type { CreateCrawlerSourceDto, CrawlerSource, CrawlerLogDto, CrawlerHourlyStatDto } from '../../types';
+import { formatDate } from '../../../../utils';
 import './CrawlerSourcesManagement.css';
 
 export const CrawlerSourcesManagement: React.FC = () => {
@@ -53,21 +54,6 @@ export const CrawlerSourcesManagement: React.FC = () => {
             console.error('Lỗi khi tải nhật ký cào tin:', err);
         } finally {
             setLogsLoading(false);
-        }
-    };
-    // Hàm định dạng ngày giờ hiển thị
-    const formatDate = (dateStr?: string) => {
-        if (!dateStr) return 'Chưa có';
-        try {
-            const d = new Date(dateStr);
-            return new Intl.DateTimeFormat('vi-VN', {
-                hour: '2-digit',
-                minute: '2-digit',
-                day: '2-digit',
-                month: '2-digit',
-            }).format(d);
-        } catch {
-            return dateStr;
         }
     };
     const [formData, setFormData] = useState<CreateCrawlerSourceDto>({

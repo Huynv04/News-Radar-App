@@ -1,0 +1,179 @@
+{
+  "info": {
+    "name": "NewsRadar API Contract Tests",
+    "description": "Kiểm tra cấu trúc JSON response của News Radar API khớp với Frontend expectation.\nDemo 2 test cases: Articles Feed và Auth Register.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5275", "type": "string" },
+    { "key": "accessToken", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Contract TC1 — Articles: GET /api/articles",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// ── Status Code ──────────────────────────────────────────────",
+              "pm.test('Status code is 200', function() {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "// ── Content-Type ─────────────────────────────────────────────",
+              "pm.test('Response is JSON', function() {",
+              "  pm.response.to.have.header('Content-Type');",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+              "});",
+              "",
+              "// ── Top-level structure (CursorPagedResult<ArticleDto>) ──────",
+              "pm.test('Response has CursorPagedResult structure', function() {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body).to.have.property('items').that.is.an('array');",
+              "  pm.expect(body).to.have.property('hasNextPage').that.is.a('boolean');",
+              "  // nextLastPublishedAt và nextLastId có thể null nếu ít bài",
+              "  pm.expect(body).to.have.property('nextLastPublishedAt');",
+              "  pm.expect(body).to.have.property('nextLastId');",
+              "});",
+              "",
+              "// ── ArticleDto field contract ─────────────────────────────────",
+              "pm.test('Each ArticleDto has required fields', function() {",
+              "  const body = pm.response.json();",
+              "  if (body.items.length === 0) { return; }  // DB rỗng — bỏ qua",
+              "  const article = body.items[0];",
+              "  const requiredFields = [",
+              "    'id', 'title', 'sapo', 'url',",
+              "    'category', 'sentimentLabel', 'sentimentScore',",
+              "    'trendScore', 'publishedAt', 'crawledAt',",
+              "    'crawlerSourceId', 'crawlerSourceName',",
+              "    'isPinned', 'clusterCount'",
+              "  ];",
+              "  requiredFields.forEach(field => {",
+              "    pm.expect(article, `Field '${field}' phải tồn tại`).to.have.property(field);",
+              "  });",
+              "});",
+              "",
+              "// ── SentimentLabel enum contract ──────────────────────────────",
+              "pm.test('SentimentLabel is one of valid enum values', function() {",
+              "  const body = pm.response.json();",
+              "  const validLabels = ['Positive', 'Negative', 'Neutral'];",
+              "  body.items.forEach(article => {",
+              "    pm.expect(validLabels).to.include(article.sentimentLabel,",
+              "      `sentimentLabel '${article.sentimentLabel}' không hợp lệ`);",
+              "  });",
+              "});",
+              "",
+              "// ── Pagination: items.length <= pageSize ─────────────────────",
+              "pm.test('Items count does not exceed pageSize', function() {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.items.length).to.be.at.most(5);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/articles?pageSize=5"
+      }
+    },
+    {
+      "name": "Contract TC2 — Auth: POST /api/auth/register",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "// Tạo email ngẫu nhiên để tránh conflict",
+              "const randomEmail = `contract_test_${Date.now()}@newsradar.test`;",
+              "pm.environment.set('testEmail', randomEmail);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// ── Status Code ──────────────────────────────────────────────",
+              "pm.test('Register returns 201 Created', function() {",
+              "  pm.response.to.have.status(201);",
+              "});",
+              "",
+              "// ── AuthResponse contract ─────────────────────────────────────",
+              "pm.test('AuthResponse has accessToken, refreshToken, user', function() {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body).to.have.property('accessToken').that.is.a('string').and.not.empty;",
+              "  pm.expect(body).to.have.property('refreshToken').that.is.a('string').and.not.empty;",
+              "  pm.expect(body).to.have.property('user').that.is.an('object');",
+              "});",
+              "",
+              "// ── UserProfileDto contract ───────────────────────────────────",
+              "pm.test('UserProfileDto has correct fields and types', function() {",
+              "  const user = pm.response.json().user;",
+              "  pm.expect(user).to.have.property('id').that.is.a('string');",
+              "  pm.expect(user).to.have.property('displayName').that.is.a('string');",
+              "  pm.expect(user).to.have.property('email').that.is.a('string');",
+              "  pm.expect(user).to.have.property('role').that.equals('User');",
+              "});",
+              "",
+              "// ── JWT format (3 parts separated by dots) ───────────────────",
+              "pm.test('AccessToken is valid JWT format', function() {",
+              "  const token = pm.response.json().accessToken;",
+              "  const parts = token.split('.');",
+              "  pm.expect(parts).to.have.lengthOf(3, 'JWT phải có đúng 3 phần');",
+              "});",
+              "",
+              "// Lưu token để dùng ở các request tiếp theo",
+              "const accessToken = pm.response.json().accessToken;",
+              "pm.collectionVariables.set('accessToken', accessToken);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"displayName\": \"Contract Test User\",\n  \"email\": \"{{testEmail}}\",\n  \"password\": \"Contract@12345\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Contract TC3 — Analytics: GET /api/analytics/dashboard",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Analytics returns 200', function() {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('DashboardAnalyticsDto has all required sections', function() {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body).to.have.property('totalArticles').that.is.a('number');",
+              "  pm.expect(body).to.have.property('sentimentStats').that.is.an('array');",
+              "  pm.expect(body).to.have.property('categoryStats').that.is.an('array');",
+              "  pm.expect(body).to.have.property('hotKeywords24h').that.is.an('array');",
+              "  pm.expect(body).to.have.property('topTrendingArticles').that.is.an('array');",
+              "});",
+              "",
+              "pm.test('SentimentStats has Positive, Negative, Neutral entries', function() {",
+              "  const sentiments = pm.response.json().sentimentStats.map(s => s.sentiment);",
+              "  pm.expect(sentiments).to.include.members(['Positive', 'Negative', 'Neutral']);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/analytics/dashboard"
+      }
+    }
+  ]
+}
+

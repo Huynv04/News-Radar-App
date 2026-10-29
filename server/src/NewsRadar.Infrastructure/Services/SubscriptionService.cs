@@ -103,9 +103,18 @@ public class SubscriptionService : ISubscriptionService
         public async Task<List<(Guid UserId, string Email, string DisplayName, string Channel, string Keyword)>> GetActiveSubscribersForKeywordAsync(
         string keyword, CancellationToken cancellationToken = default)
     {
-        return await _db.Subscriptions
-            .Where(s => s.IsActive &&
-                        EF.Functions.ILike(keyword, $"%{s.Keyword}%")) // So khớp không phân biệt hoa thường
+        var query = _db.Subscriptions.Where(s => s.IsActive);
+        if ((_db as DbContext)?.Database.IsNpgsql() == true)
+        {
+            query = query.Where(s => EF.Functions.ILike(keyword, $"%{s.Keyword}%"));
+        }
+        else
+        {
+            var lowerKeyword = keyword.ToLower();
+            query = query.Where(s => lowerKeyword.Contains(s.Keyword.ToLower()));
+        }
+
+        return await query
             .Include(s => s.User)
             .Select(s => ValueTuple.Create(
                 s.UserId,               // ⬅️ Bổ sung UserId

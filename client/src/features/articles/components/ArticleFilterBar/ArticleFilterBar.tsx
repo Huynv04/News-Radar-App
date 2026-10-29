@@ -1,4 +1,5 @@
 import React from 'react';
+import { getSentimentMeta } from '../../../../utils';
 import './ArticleFilterBar.css';
 
 const CATEGORIES = [
@@ -16,9 +17,9 @@ const CATEGORIES = [
 
 const SENTIMENTS = [
     { label: 'Tất cả cảm xúc', value: '' },
-    { label: '🟢 Tích cực', value: 'Positive' },
-    { label: '🔴 Tiêu cực', value: 'Negative' },
-    { label: '⚪ Trung lập', value: 'Neutral' },
+    { label: `${getSentimentMeta('Positive').icon} ${getSentimentMeta('Positive').label}`, value: 'Positive' },
+    { label: `${getSentimentMeta('Negative').icon} ${getSentimentMeta('Negative').label}`, value: 'Negative' },
+    { label: `${getSentimentMeta('Neutral').icon} ${getSentimentMeta('Neutral').label}`, value: 'Neutral' },
 ];
 
 export interface SourceOption {

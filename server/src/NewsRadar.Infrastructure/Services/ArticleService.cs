@@ -34,11 +34,23 @@ public class ArticleService : IArticleService
         if (!string.IsNullOrWhiteSpace(filter.SearchKeyword))
         {
             var kw = filter.SearchKeyword.Trim();
-            query = query.Where(a =>
-                EF.Functions.ILike(a.Title, $"%{kw}%") ||
-                EF.Functions.ILike(a.Sapo, $"%{kw}%") ||
-                (a.Content != null && EF.Functions.ILike(a.Content, $"%{kw}%")) ||
-                (a.Author != null && EF.Functions.ILike(a.Author, $"%{kw}%")));
+            if (_context.Database.IsNpgsql())
+            {
+                query = query.Where(a =>
+                    EF.Functions.ILike(a.Title, $"%{kw}%") ||
+                    EF.Functions.ILike(a.Sapo, $"%{kw}%") ||
+                    (a.Content != null && EF.Functions.ILike(a.Content, $"%{kw}%")) ||
+                    (a.Author != null && EF.Functions.ILike(a.Author, $"%{kw}%")));
+            }
+            else
+            {
+                var lowerKw = kw.ToLower();
+                query = query.Where(a =>
+                    a.Title.ToLower().Contains(lowerKw) ||
+                    a.Sapo.ToLower().Contains(lowerKw) ||
+                    (a.Content != null && a.Content.ToLower().Contains(lowerKw)) ||
+                    (a.Author != null && a.Author.ToLower().Contains(lowerKw)));
+            }
         }
 
         // Filter: Sentiment
