@@ -10,10 +10,22 @@ var builder = WebApplication.CreateBuilder(args);
 var allowedOrigins = builder.Configuration["AllowedOrigins"] ?? "http://localhost:5173";
 builder.Services.AddCors(options =>
     options.AddPolicy("AllowReactApp", policy =>
-        policy.WithOrigins(allowedOrigins.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials()));
+    {
+        if (allowedOrigins.Trim() == "*")
+        {
+            policy.SetIsOriginAllowed(_ => true)
+                  .AllowAnyMethod()
+                  .AllowAnyHeader()
+                  .AllowCredentials();
+        }
+        else
+        {
+            policy.WithOrigins(allowedOrigins.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                  .AllowAnyMethod()
+                  .AllowAnyHeader()
+                  .AllowCredentials();
+        }
+    }));
 
 // ── Core Services ─────────────────────────────────────────────────────────────
 builder.Services.AddControllers();
